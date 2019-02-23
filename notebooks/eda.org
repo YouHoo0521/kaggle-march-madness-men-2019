@@ -1,0 +1,10 @@
+#+OPTIONS: ^:nil toc:nil num:nil
+#+BEGIN_EXPORT html
+---
+layout: default
+title: EDA
+---
+#+END_EXPORT
+
+#+TOC: headlines 3
+

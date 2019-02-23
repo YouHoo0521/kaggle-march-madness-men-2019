@@ -41,3 +41,7 @@ plugins:
 
 header_pages:
   - index.html
+  - data.html
+  - eda.html
+  - models.html
+  - misc.html

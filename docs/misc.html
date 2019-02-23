@@ -1,0 +1,65 @@
+---
+layout: default
+title: Misc
+---
+
+<p>
+This page contains random off-topic notes for my own sanity.
+</p>
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#org21184de">1. Using Org to publish html</a>
+<ul>
+<li><a href="#org4ac48de">1.1. References</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org21184de" class="outline-2">
+<h2 id="org21184de"><span class="section-number-2">1</span> Using Org to publish html</h2>
+<div class="outline-text-2" id="text-1">
+<div class="org-src-container">
+<pre class="src src-lisp">(<span style="color: #a020f0;">require</span> '<span style="color: #008b8b;">ox-publish</span>)
+(setq org-publish-project-alist
+      '(
+
+        (<span style="color: #8b2252;">"org-notebooks"</span>
+         <span style="color: #483d8b;">:base-directory</span> <span style="color: #8b2252;">"~/statistics/projects/march_madness/notebooks/"</span>
+         <span style="color: #483d8b;">:base-extension</span> <span style="color: #8b2252;">"org"</span>
+         <span style="color: #483d8b;">:publishing-directory</span> <span style="color: #8b2252;">"~/statistics/projects/march_madness/docs/"</span>
+         <span style="color: #483d8b;">:recursive</span> t
+         <span style="color: #483d8b;">:publishing-function</span> org-html-publish-to-html
+         <span style="color: #483d8b;">:headline-levels</span> 4
+         <span style="color: #483d8b;">:html-extension</span> <span style="color: #8b2252;">"html"</span>
+         <span style="color: #483d8b;">:body-only</span> t <span style="color: #b22222;">;; </span><span style="color: #b22222;">only export section between &lt;body&gt; &lt;/body&gt;</span>
+         )
+
+        (<span style="color: #8b2252;">"org-static"</span>
+         <span style="color: #483d8b;">:base-directory</span> <span style="color: #8b2252;">"~/statistics/projects/march_madness/notebooks/"</span>
+         <span style="color: #483d8b;">:base-extension</span> <span style="color: #8b2252;">"css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"</span>
+         <span style="color: #483d8b;">:publishing-directory</span> <span style="color: #8b2252;">"~/statistics/projects/march_madness/docs/"</span>
+         <span style="color: #483d8b;">:recursive</span> t
+         <span style="color: #483d8b;">:publishing-function</span> org-publish-attachment
+         )
+
+        (<span style="color: #8b2252;">"org"</span> <span style="color: #483d8b;">:components</span> (<span style="color: #8b2252;">"org-notebooks"</span> <span style="color: #8b2252;">"org-static"</span>))
+
+      ))
+</pre>
+</div>
+</div>
+<div id="outline-container-org4ac48de" class="outline-3">
+<h3 id="org4ac48de"><span class="section-number-3">1.1</span> References</h3>
+<div class="outline-text-3" id="text-1-1">
+<ul class="org-ul">
+<li><a href="https://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.html">https://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.html</a></li>
+<li><a href="https://orgmode.org/worg/org-tutorials/org-jekyll.html">https://orgmode.org/worg/org-tutorials/org-jekyll.html</a></li>
+</ul>
+</div>
+</div>
+</div>

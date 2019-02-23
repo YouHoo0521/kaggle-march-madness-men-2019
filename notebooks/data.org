@@ -1,0 +1,542 @@
+#+OPTIONS: ^:nil toc:nil num:nil
+#+BEGIN_EXPORT html
+---
+layout: default
+title: Data Reference
+---
+#+END_EXPORT
+
+This page serves as a dataset reference. It currently shows a header
+for each dataset, but I'll update it with notes as I uncover important
+aspects of the data.
+
+Original source: https://www.kaggle.com/c/mens-machine-learning-competition-2019/data
+
+#+TOC: headlines 2
+
+* Data Section 1 - The Basics
+#+begin_src python :session :exports both :results output :eval never-export
+  import pandas as pd
+  import numpy as np
+  from tabulate import tabulate
+  import os
+  def print_df(df):
+      print(tabulate(df, headers="keys",tablefmt="html"))
+  print(os.listdir('../input/datafiles/'))
+#+end_src
+
+#+RESULTS:
+: ['SecondaryTourneyTeams.csv', 'Players_2012.csv', 'GameCities.csv', 'Events_2010.csv', 'Players_2013.csv', 'Players_2017.csv', 'Events_2011.csv', 'Events_2017.csv', 'Players_2014.csv', 'Events_2018.csv', 'NCAATourneySlots.csv', 'MasseyOrdinals.csv', 'TeamConferences.csv', 'NCAATourneyDetailedResults.csv', 'NCAATourneySeedRoundSlots.csv', 'NCAATourneySeeds.csv', 'NCAATourneyCompactResults.csv', 'TeamCoaches.csv', 'Players_2015.csv', 'Seasons.csv', 'Cities.csv', 'Players_2016.csv', 'Events_2014.csv', 'Players_2018.csv', 'Events_2012.csv', 'Events_2013.csv', 'SecondaryTourneyCompactResults.csv', 'Players_2011.csv', 'RegularSeasonCompactResults.csv', 'Events_2016.csv', 'Events_2015.csv', 'Teams.csv', 'Players_2010.csv', 'Conferences.csv', 'ConferenceTourneyGames.csv', 'TeamSpellings.csv', 'RegularSeasonDetailedResults.csv']
+
+** RegularSeasonCompactResults
+#+begin_src python :session :exports both :results output html :eval never-export
+  RegularSeasonCompactResults = pd.read_csv('../input/datafiles/RegularSeasonCompactResults.csv')
+  print("size = ", RegularSeasonCompactResults.shape)
+  print_df(RegularSeasonCompactResults.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (156089, 8)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  Season</th><th style="text-align: right;">  DayNum</th><th style="text-align: right;">  WTeamID</th><th style="text-align: right;">  WScore</th><th style="text-align: right;">  LTeamID</th><th style="text-align: right;">  LScore</th><th>WLoc  </th><th style="text-align: right;">  NumOT</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    1985</td><td style="text-align: right;">      20</td><td style="text-align: right;">     1228</td><td style="text-align: right;">      81</td><td style="text-align: right;">     1328</td><td style="text-align: right;">      64</td><td>N     </td><td style="text-align: right;">      0</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    1985</td><td style="text-align: right;">      25</td><td style="text-align: right;">     1106</td><td style="text-align: right;">      77</td><td style="text-align: right;">     1354</td><td style="text-align: right;">      70</td><td>H     </td><td style="text-align: right;">      0</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    1985</td><td style="text-align: right;">      25</td><td style="text-align: right;">     1112</td><td style="text-align: right;">      63</td><td style="text-align: right;">     1223</td><td style="text-align: right;">      56</td><td>H     </td><td style="text-align: right;">      0</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    1985</td><td style="text-align: right;">      25</td><td style="text-align: right;">     1165</td><td style="text-align: right;">      70</td><td style="text-align: right;">     1432</td><td style="text-align: right;">      54</td><td>H     </td><td style="text-align: right;">      0</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    1985</td><td style="text-align: right;">      25</td><td style="text-align: right;">     1192</td><td style="text-align: right;">      86</td><td style="text-align: right;">     1447</td><td style="text-align: right;">      74</td><td>H     </td><td style="text-align: right;">      0</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+
+** NCAATourneyCompactResults
+#+begin_src python :session :exports both :results output html :eval never-export
+  NCAATourneyCompactResults = pd.read_csv('../input/datafiles/NCAATourneyCompactResults.csv')
+  print("size = ", NCAATourneyCompactResults.shape)
+  print_df(NCAATourneyCompactResults.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (2184, 8)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  Season</th><th style="text-align: right;">  DayNum</th><th style="text-align: right;">  WTeamID</th><th style="text-align: right;">  WScore</th><th style="text-align: right;">  LTeamID</th><th style="text-align: right;">  LScore</th><th>WLoc  </th><th style="text-align: right;">  NumOT</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    1985</td><td style="text-align: right;">     136</td><td style="text-align: right;">     1116</td><td style="text-align: right;">      63</td><td style="text-align: right;">     1234</td><td style="text-align: right;">      54</td><td>N     </td><td style="text-align: right;">      0</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    1985</td><td style="text-align: right;">     136</td><td style="text-align: right;">     1120</td><td style="text-align: right;">      59</td><td style="text-align: right;">     1345</td><td style="text-align: right;">      58</td><td>N     </td><td style="text-align: right;">      0</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    1985</td><td style="text-align: right;">     136</td><td style="text-align: right;">     1207</td><td style="text-align: right;">      68</td><td style="text-align: right;">     1250</td><td style="text-align: right;">      43</td><td>N     </td><td style="text-align: right;">      0</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    1985</td><td style="text-align: right;">     136</td><td style="text-align: right;">     1229</td><td style="text-align: right;">      58</td><td style="text-align: right;">     1425</td><td style="text-align: right;">      55</td><td>N     </td><td style="text-align: right;">      0</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    1985</td><td style="text-align: right;">     136</td><td style="text-align: right;">     1242</td><td style="text-align: right;">      49</td><td style="text-align: right;">     1325</td><td style="text-align: right;">      38</td><td>N     </td><td style="text-align: right;">      0</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+** NCAATourneySeeds
+#+begin_src python :session :exports both :results output html :eval never-export
+  NCAATourneySeeds = pd.read_csv('../input/datafiles/NCAATourneySeeds.csv')
+  print("size = ", NCAATourneySeeds.shape)
+  print_df(NCAATourneySeeds.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (2218, 3)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  Season</th><th>Seed  </th><th style="text-align: right;">  TeamID</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    1985</td><td>W01   </td><td style="text-align: right;">    1207</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    1985</td><td>W02   </td><td style="text-align: right;">    1210</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    1985</td><td>W03   </td><td style="text-align: right;">    1228</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    1985</td><td>W04   </td><td style="text-align: right;">    1260</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    1985</td><td>W05   </td><td style="text-align: right;">    1374</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+** Seasons
+#+begin_src python :session :exports both :results output html :eval never-export
+  Seasons = pd.read_csv('../input/datafiles/Seasons.csv')
+  print("size = ", Seasons.shape)
+  print_df(Seasons.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (35, 6)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  Season</th><th>DayZero   </th><th>RegionW  </th><th>RegionX  </th><th>RegionY  </th><th>RegionZ  </th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    1985</td><td>10/29/1984</td><td>East     </td><td>West     </td><td>Midwest  </td><td>Southeast</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    1986</td><td>10/28/1985</td><td>East     </td><td>Midwest  </td><td>Southeast</td><td>West     </td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    1987</td><td>10/27/1986</td><td>East     </td><td>Southeast</td><td>Midwest  </td><td>West     </td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    1988</td><td>11/2/1987 </td><td>East     </td><td>Midwest  </td><td>Southeast</td><td>West     </td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    1989</td><td>10/31/1988</td><td>East     </td><td>West     </td><td>Midwest  </td><td>Southeast</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+** Teams
+#+begin_src python :session :exports both :results output html :eval never-export
+  Teams = pd.read_csv('../input/datafiles/Teams.csv')
+  print("size = ", Teams.shape)
+  print_df(Teams.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (366, 4)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  TeamID</th><th>TeamName   </th><th style="text-align: right;">  FirstD1Season</th><th style="text-align: right;">  LastD1Season</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    1101</td><td>Abilene Chr</td><td style="text-align: right;">           2014</td><td style="text-align: right;">          2019</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    1102</td><td>Air Force  </td><td style="text-align: right;">           1985</td><td style="text-align: right;">          2019</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    1103</td><td>Akron      </td><td style="text-align: right;">           1985</td><td style="text-align: right;">          2019</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    1104</td><td>Alabama    </td><td style="text-align: right;">           1985</td><td style="text-align: right;">          2019</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    1105</td><td>Alabama A&M</td><td style="text-align: right;">           2000</td><td style="text-align: right;">          2019</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+** SampleSubmissionStage1
+#+begin_src python :session :exports both :results output html :eval never-export
+  SampleSubmissionStage1 = pd.read_csv('../input/SampleSubmissionStage1.csv')
+  print("size = ", SampleSubmissionStage1.shape)
+  print_df(SampleSubmissionStage1.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (11390, 2)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">            ID</th><th style="text-align: right;">  Pred</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">2014_1107_1110</td><td style="text-align: right;">   0.5</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">2014_1107_1112</td><td style="text-align: right;">   0.5</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">2014_1107_1113</td><td style="text-align: right;">   0.5</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">2014_1107_1124</td><td style="text-align: right;">   0.5</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">2014_1107_1140</td><td style="text-align: right;">   0.5</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+* Data Section 2 - Team Box Scores
+Variables:
+- WFGM - field goals made (by the winning team)
+- WFGA - field goals attempted (by the winning team)
+- WFGM3 - three pointers made (by the winning team)
+- WFGA3 - three pointers attempted (by the winning team)
+- WFTM - free throws made (by the winning team)
+- WFTA - free throws attempted (by the winning team)
+- WOR - offensive rebounds (pulled by the winning team)
+- WDR - defensive rebounds (pulled by the winning team)
+- WAst - assists (by the winning team)
+- WTO - turnovers committed (by the winning team)
+- WStl - steals (accomplished by the winning team)
+- WBlk - blocks (accomplished by the winning team)
+- WPF - personal fouls committed (by the winning team)
+
+** RegularSeasonDetailedResults
+#+begin_src python :session :exports both :results output html :eval never-export
+  RegularSeasonDetailedResults = pd.read_csv('../input/datafiles/RegularSeasonDetailedResults.csv')
+  print("size = ", RegularSeasonDetailedResults.shape)
+  print_df(RegularSeasonDetailedResults.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (82041, 34)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  Season</th><th style="text-align: right;">  DayNum</th><th style="text-align: right;">  WTeamID</th><th style="text-align: right;">  WScore</th><th style="text-align: right;">  LTeamID</th><th style="text-align: right;">  LScore</th><th>WLoc  </th><th style="text-align: right;">  NumOT</th><th style="text-align: right;">  WFGM</th><th style="text-align: right;">  WFGA</th><th style="text-align: right;">  WFGM3</th><th style="text-align: right;">  WFGA3</th><th style="text-align: right;">  WFTM</th><th style="text-align: right;">  WFTA</th><th style="text-align: right;">  WOR</th><th style="text-align: right;">  WDR</th><th style="text-align: right;">  WAst</th><th style="text-align: right;">  WTO</th><th style="text-align: right;">  WStl</th><th style="text-align: right;">  WBlk</th><th style="text-align: right;">  WPF</th><th style="text-align: right;">  LFGM</th><th style="text-align: right;">  LFGA</th><th style="text-align: right;">  LFGM3</th><th style="text-align: right;">  LFGA3</th><th style="text-align: right;">  LFTM</th><th style="text-align: right;">  LFTA</th><th style="text-align: right;">  LOR</th><th style="text-align: right;">  LDR</th><th style="text-align: right;">  LAst</th><th style="text-align: right;">  LTO</th><th style="text-align: right;">  LStl</th><th style="text-align: right;">  LBlk</th><th style="text-align: right;">  LPF</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    2003</td><td style="text-align: right;">      10</td><td style="text-align: right;">     1104</td><td style="text-align: right;">      68</td><td style="text-align: right;">     1328</td><td style="text-align: right;">      62</td><td>N     </td><td style="text-align: right;">      0</td><td style="text-align: right;">    27</td><td style="text-align: right;">    58</td><td style="text-align: right;">      3</td><td style="text-align: right;">     14</td><td style="text-align: right;">    11</td><td style="text-align: right;">    18</td><td style="text-align: right;">   14</td><td style="text-align: right;">   24</td><td style="text-align: right;">    13</td><td style="text-align: right;">   23</td><td style="text-align: right;">     7</td><td style="text-align: right;">     1</td><td style="text-align: right;">   22</td><td style="text-align: right;">    22</td><td style="text-align: right;">    53</td><td style="text-align: right;">      2</td><td style="text-align: right;">     10</td><td style="text-align: right;">    16</td><td style="text-align: right;">    22</td><td style="text-align: right;">   10</td><td style="text-align: right;">   22</td><td style="text-align: right;">     8</td><td style="text-align: right;">   18</td><td style="text-align: right;">     9</td><td style="text-align: right;">     2</td><td style="text-align: right;">   20</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    2003</td><td style="text-align: right;">      10</td><td style="text-align: right;">     1272</td><td style="text-align: right;">      70</td><td style="text-align: right;">     1393</td><td style="text-align: right;">      63</td><td>N     </td><td style="text-align: right;">      0</td><td style="text-align: right;">    26</td><td style="text-align: right;">    62</td><td style="text-align: right;">      8</td><td style="text-align: right;">     20</td><td style="text-align: right;">    10</td><td style="text-align: right;">    19</td><td style="text-align: right;">   15</td><td style="text-align: right;">   28</td><td style="text-align: right;">    16</td><td style="text-align: right;">   13</td><td style="text-align: right;">     4</td><td style="text-align: right;">     4</td><td style="text-align: right;">   18</td><td style="text-align: right;">    24</td><td style="text-align: right;">    67</td><td style="text-align: right;">      6</td><td style="text-align: right;">     24</td><td style="text-align: right;">     9</td><td style="text-align: right;">    20</td><td style="text-align: right;">   20</td><td style="text-align: right;">   25</td><td style="text-align: right;">     7</td><td style="text-align: right;">   12</td><td style="text-align: right;">     8</td><td style="text-align: right;">     6</td><td style="text-align: right;">   16</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    2003</td><td style="text-align: right;">      11</td><td style="text-align: right;">     1266</td><td style="text-align: right;">      73</td><td style="text-align: right;">     1437</td><td style="text-align: right;">      61</td><td>N     </td><td style="text-align: right;">      0</td><td style="text-align: right;">    24</td><td style="text-align: right;">    58</td><td style="text-align: right;">      8</td><td style="text-align: right;">     18</td><td style="text-align: right;">    17</td><td style="text-align: right;">    29</td><td style="text-align: right;">   17</td><td style="text-align: right;">   26</td><td style="text-align: right;">    15</td><td style="text-align: right;">   10</td><td style="text-align: right;">     5</td><td style="text-align: right;">     2</td><td style="text-align: right;">   25</td><td style="text-align: right;">    22</td><td style="text-align: right;">    73</td><td style="text-align: right;">      3</td><td style="text-align: right;">     26</td><td style="text-align: right;">    14</td><td style="text-align: right;">    23</td><td style="text-align: right;">   31</td><td style="text-align: right;">   22</td><td style="text-align: right;">     9</td><td style="text-align: right;">   12</td><td style="text-align: right;">     2</td><td style="text-align: right;">     5</td><td style="text-align: right;">   23</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    2003</td><td style="text-align: right;">      11</td><td style="text-align: right;">     1296</td><td style="text-align: right;">      56</td><td style="text-align: right;">     1457</td><td style="text-align: right;">      50</td><td>N     </td><td style="text-align: right;">      0</td><td style="text-align: right;">    18</td><td style="text-align: right;">    38</td><td style="text-align: right;">      3</td><td style="text-align: right;">      9</td><td style="text-align: right;">    17</td><td style="text-align: right;">    31</td><td style="text-align: right;">    6</td><td style="text-align: right;">   19</td><td style="text-align: right;">    11</td><td style="text-align: right;">   12</td><td style="text-align: right;">    14</td><td style="text-align: right;">     2</td><td style="text-align: right;">   18</td><td style="text-align: right;">    18</td><td style="text-align: right;">    49</td><td style="text-align: right;">      6</td><td style="text-align: right;">     22</td><td style="text-align: right;">     8</td><td style="text-align: right;">    15</td><td style="text-align: right;">   17</td><td style="text-align: right;">   20</td><td style="text-align: right;">     9</td><td style="text-align: right;">   19</td><td style="text-align: right;">     4</td><td style="text-align: right;">     3</td><td style="text-align: right;">   23</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    2003</td><td style="text-align: right;">      11</td><td style="text-align: right;">     1400</td><td style="text-align: right;">      77</td><td style="text-align: right;">     1208</td><td style="text-align: right;">      71</td><td>N     </td><td style="text-align: right;">      0</td><td style="text-align: right;">    30</td><td style="text-align: right;">    61</td><td style="text-align: right;">      6</td><td style="text-align: right;">     14</td><td style="text-align: right;">    11</td><td style="text-align: right;">    13</td><td style="text-align: right;">   17</td><td style="text-align: right;">   22</td><td style="text-align: right;">    12</td><td style="text-align: right;">   14</td><td style="text-align: right;">     4</td><td style="text-align: right;">     4</td><td style="text-align: right;">   20</td><td style="text-align: right;">    24</td><td style="text-align: right;">    62</td><td style="text-align: right;">      6</td><td style="text-align: right;">     16</td><td style="text-align: right;">    17</td><td style="text-align: right;">    27</td><td style="text-align: right;">   21</td><td style="text-align: right;">   15</td><td style="text-align: right;">    12</td><td style="text-align: right;">   10</td><td style="text-align: right;">     7</td><td style="text-align: right;">     1</td><td style="text-align: right;">   14</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+** NCAATourneyDetailedResults
+#+begin_src python :session :exports both :results output html :eval never-export
+  NCAATourneyDetailedResults = pd.read_csv('../input/datafiles/NCAATourneyDetailedResults.csv')
+  print("size = ", NCAATourneyDetailedResults.shape)
+  print_df(NCAATourneyDetailedResults.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (1048, 34)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  Season</th><th style="text-align: right;">  DayNum</th><th style="text-align: right;">  WTeamID</th><th style="text-align: right;">  WScore</th><th style="text-align: right;">  LTeamID</th><th style="text-align: right;">  LScore</th><th>WLoc  </th><th style="text-align: right;">  NumOT</th><th style="text-align: right;">  WFGM</th><th style="text-align: right;">  WFGA</th><th style="text-align: right;">  WFGM3</th><th style="text-align: right;">  WFGA3</th><th style="text-align: right;">  WFTM</th><th style="text-align: right;">  WFTA</th><th style="text-align: right;">  WOR</th><th style="text-align: right;">  WDR</th><th style="text-align: right;">  WAst</th><th style="text-align: right;">  WTO</th><th style="text-align: right;">  WStl</th><th style="text-align: right;">  WBlk</th><th style="text-align: right;">  WPF</th><th style="text-align: right;">  LFGM</th><th style="text-align: right;">  LFGA</th><th style="text-align: right;">  LFGM3</th><th style="text-align: right;">  LFGA3</th><th style="text-align: right;">  LFTM</th><th style="text-align: right;">  LFTA</th><th style="text-align: right;">  LOR</th><th style="text-align: right;">  LDR</th><th style="text-align: right;">  LAst</th><th style="text-align: right;">  LTO</th><th style="text-align: right;">  LStl</th><th style="text-align: right;">  LBlk</th><th style="text-align: right;">  LPF</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    2003</td><td style="text-align: right;">     134</td><td style="text-align: right;">     1421</td><td style="text-align: right;">      92</td><td style="text-align: right;">     1411</td><td style="text-align: right;">      84</td><td>N     </td><td style="text-align: right;">      1</td><td style="text-align: right;">    32</td><td style="text-align: right;">    69</td><td style="text-align: right;">     11</td><td style="text-align: right;">     29</td><td style="text-align: right;">    17</td><td style="text-align: right;">    26</td><td style="text-align: right;">   14</td><td style="text-align: right;">   30</td><td style="text-align: right;">    17</td><td style="text-align: right;">   12</td><td style="text-align: right;">     5</td><td style="text-align: right;">     3</td><td style="text-align: right;">   22</td><td style="text-align: right;">    29</td><td style="text-align: right;">    67</td><td style="text-align: right;">     12</td><td style="text-align: right;">     31</td><td style="text-align: right;">    14</td><td style="text-align: right;">    31</td><td style="text-align: right;">   17</td><td style="text-align: right;">   28</td><td style="text-align: right;">    16</td><td style="text-align: right;">   15</td><td style="text-align: right;">     5</td><td style="text-align: right;">     0</td><td style="text-align: right;">   22</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    2003</td><td style="text-align: right;">     136</td><td style="text-align: right;">     1112</td><td style="text-align: right;">      80</td><td style="text-align: right;">     1436</td><td style="text-align: right;">      51</td><td>N     </td><td style="text-align: right;">      0</td><td style="text-align: right;">    31</td><td style="text-align: right;">    66</td><td style="text-align: right;">      7</td><td style="text-align: right;">     23</td><td style="text-align: right;">    11</td><td style="text-align: right;">    14</td><td style="text-align: right;">   11</td><td style="text-align: right;">   36</td><td style="text-align: right;">    22</td><td style="text-align: right;">   16</td><td style="text-align: right;">    10</td><td style="text-align: right;">     7</td><td style="text-align: right;">    8</td><td style="text-align: right;">    20</td><td style="text-align: right;">    64</td><td style="text-align: right;">      4</td><td style="text-align: right;">     16</td><td style="text-align: right;">     7</td><td style="text-align: right;">     7</td><td style="text-align: right;">    8</td><td style="text-align: right;">   26</td><td style="text-align: right;">    12</td><td style="text-align: right;">   17</td><td style="text-align: right;">    10</td><td style="text-align: right;">     3</td><td style="text-align: right;">   15</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    2003</td><td style="text-align: right;">     136</td><td style="text-align: right;">     1113</td><td style="text-align: right;">      84</td><td style="text-align: right;">     1272</td><td style="text-align: right;">      71</td><td>N     </td><td style="text-align: right;">      0</td><td style="text-align: right;">    31</td><td style="text-align: right;">    59</td><td style="text-align: right;">      6</td><td style="text-align: right;">     14</td><td style="text-align: right;">    16</td><td style="text-align: right;">    22</td><td style="text-align: right;">   10</td><td style="text-align: right;">   27</td><td style="text-align: right;">    18</td><td style="text-align: right;">    9</td><td style="text-align: right;">     7</td><td style="text-align: right;">     4</td><td style="text-align: right;">   19</td><td style="text-align: right;">    25</td><td style="text-align: right;">    69</td><td style="text-align: right;">      7</td><td style="text-align: right;">     28</td><td style="text-align: right;">    14</td><td style="text-align: right;">    21</td><td style="text-align: right;">   20</td><td style="text-align: right;">   22</td><td style="text-align: right;">    11</td><td style="text-align: right;">   12</td><td style="text-align: right;">     2</td><td style="text-align: right;">     5</td><td style="text-align: right;">   18</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    2003</td><td style="text-align: right;">     136</td><td style="text-align: right;">     1141</td><td style="text-align: right;">      79</td><td style="text-align: right;">     1166</td><td style="text-align: right;">      73</td><td>N     </td><td style="text-align: right;">      0</td><td style="text-align: right;">    29</td><td style="text-align: right;">    53</td><td style="text-align: right;">      3</td><td style="text-align: right;">      7</td><td style="text-align: right;">    18</td><td style="text-align: right;">    25</td><td style="text-align: right;">   11</td><td style="text-align: right;">   20</td><td style="text-align: right;">    15</td><td style="text-align: right;">   18</td><td style="text-align: right;">    13</td><td style="text-align: right;">     1</td><td style="text-align: right;">   19</td><td style="text-align: right;">    27</td><td style="text-align: right;">    60</td><td style="text-align: right;">      7</td><td style="text-align: right;">     17</td><td style="text-align: right;">    12</td><td style="text-align: right;">    17</td><td style="text-align: right;">   14</td><td style="text-align: right;">   17</td><td style="text-align: right;">    20</td><td style="text-align: right;">   21</td><td style="text-align: right;">     6</td><td style="text-align: right;">     6</td><td style="text-align: right;">   21</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    2003</td><td style="text-align: right;">     136</td><td style="text-align: right;">     1143</td><td style="text-align: right;">      76</td><td style="text-align: right;">     1301</td><td style="text-align: right;">      74</td><td>N     </td><td style="text-align: right;">      1</td><td style="text-align: right;">    27</td><td style="text-align: right;">    64</td><td style="text-align: right;">      7</td><td style="text-align: right;">     20</td><td style="text-align: right;">    15</td><td style="text-align: right;">    23</td><td style="text-align: right;">   18</td><td style="text-align: right;">   20</td><td style="text-align: right;">    17</td><td style="text-align: right;">   13</td><td style="text-align: right;">     8</td><td style="text-align: right;">     2</td><td style="text-align: right;">   14</td><td style="text-align: right;">    25</td><td style="text-align: right;">    56</td><td style="text-align: right;">      9</td><td style="text-align: right;">     21</td><td style="text-align: right;">    15</td><td style="text-align: right;">    20</td><td style="text-align: right;">   10</td><td style="text-align: right;">   26</td><td style="text-align: right;">    16</td><td style="text-align: right;">   14</td><td style="text-align: right;">     5</td><td style="text-align: right;">     8</td><td style="text-align: right;">   19</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+* Data Section 3 - Geography
+** Cities
+#+begin_src python :session :exports both :results output html :eval never-export
+  Cities = pd.read_csv('../input/datafiles/Cities.csv')
+  print("size = ", Cities.shape)
+  print_df(Cities.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (421, 3)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  CityID</th><th>City       </th><th>State  </th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    4001</td><td>Abilene    </td><td>TX     </td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    4002</td><td>Akron      </td><td>OH     </td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    4003</td><td>Albany     </td><td>NY     </td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    4004</td><td>Albuquerque</td><td>NM     </td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    4005</td><td>Allentown  </td><td>PA     </td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+** GameCities
+#+begin_src python :session :exports both :results output html :eval never-export
+  GameCities = pd.read_csv('../input/datafiles/GameCities.csv')
+  print("size = ", GameCities.shape)
+  print_df(GameCities.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (49235, 6)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  Season</th><th style="text-align: right;">  DayNum</th><th style="text-align: right;">  WTeamID</th><th style="text-align: right;">  LTeamID</th><th>CRType  </th><th style="text-align: right;">  CityID</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    2010</td><td style="text-align: right;">       7</td><td style="text-align: right;">     1143</td><td style="text-align: right;">     1293</td><td>Regular </td><td style="text-align: right;">    4027</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    2010</td><td style="text-align: right;">       7</td><td style="text-align: right;">     1314</td><td style="text-align: right;">     1198</td><td>Regular </td><td style="text-align: right;">    4061</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    2010</td><td style="text-align: right;">       7</td><td style="text-align: right;">     1326</td><td style="text-align: right;">     1108</td><td>Regular </td><td style="text-align: right;">    4080</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    2010</td><td style="text-align: right;">       7</td><td style="text-align: right;">     1393</td><td style="text-align: right;">     1107</td><td>Regular </td><td style="text-align: right;">    4340</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    2010</td><td style="text-align: right;">       9</td><td style="text-align: right;">     1143</td><td style="text-align: right;">     1178</td><td>Regular </td><td style="text-align: right;">    4027</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+* Data Section 4 - Public Rankings
+** MasseyOrdinals
+#+begin_src python :session :exports both :results output html :eval never-export
+  MasseyOrdinals = pd.read_csv('../input/datafiles/MasseyOrdinals.csv')
+  print("size = ", MasseyOrdinals.shape)
+  print_df(MasseyOrdinals.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (3492320, 5)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  Season</th><th style="text-align: right;">  RankingDayNum</th><th>SystemName  </th><th style="text-align: right;">  TeamID</th><th style="text-align: right;">  OrdinalRank</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    2003</td><td style="text-align: right;">             35</td><td>SEL         </td><td style="text-align: right;">    1102</td><td style="text-align: right;">          159</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    2003</td><td style="text-align: right;">             35</td><td>SEL         </td><td style="text-align: right;">    1103</td><td style="text-align: right;">          229</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    2003</td><td style="text-align: right;">             35</td><td>SEL         </td><td style="text-align: right;">    1104</td><td style="text-align: right;">           12</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    2003</td><td style="text-align: right;">             35</td><td>SEL         </td><td style="text-align: right;">    1105</td><td style="text-align: right;">          314</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    2003</td><td style="text-align: right;">             35</td><td>SEL         </td><td style="text-align: right;">    1106</td><td style="text-align: right;">          260</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+* Data Section 5 - Play by Play
+** Events_2015
+#+begin_src python :session :exports both :results output html :eval never-export
+  Events_2015 = pd.read_csv('../input/datafiles/Events_2015.csv')
+  print("size = ", Events_2015.shape)
+  print_df(Events_2015.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (2548633, 11)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  EventID</th><th style="text-align: right;">  Season</th><th style="text-align: right;">  DayNum</th><th style="text-align: right;">  WTeamID</th><th style="text-align: right;">  LTeamID</th><th style="text-align: right;">  WPoints</th><th style="text-align: right;">  LPoints</th><th style="text-align: right;">  ElapsedSeconds</th><th style="text-align: right;">  EventTeamID</th><th style="text-align: right;">  EventPlayerID</th><th>EventType  </th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;"> 12703749</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">     1103</td><td style="text-align: right;">     1420</td><td style="text-align: right;">        0</td><td style="text-align: right;">        0</td><td style="text-align: right;">              19</td><td style="text-align: right;">         1103</td><td style="text-align: right;">         626476</td><td>miss3_jump </td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;"> 12703750</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">     1103</td><td style="text-align: right;">     1420</td><td style="text-align: right;">        0</td><td style="text-align: right;">        0</td><td style="text-align: right;">              19</td><td style="text-align: right;">         1420</td><td style="text-align: right;">         631228</td><td>reb_def    </td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;"> 12703751</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">     1103</td><td style="text-align: right;">     1420</td><td style="text-align: right;">        0</td><td style="text-align: right;">        0</td><td style="text-align: right;">              27</td><td style="text-align: right;">         1420</td><td style="text-align: right;">         631233</td><td>assist     </td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;"> 12703752</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">     1103</td><td style="text-align: right;">     1420</td><td style="text-align: right;">        0</td><td style="text-align: right;">        2</td><td style="text-align: right;">              27</td><td style="text-align: right;">         1420</td><td style="text-align: right;">         631230</td><td>made2_dunk </td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;"> 12703753</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">     1103</td><td style="text-align: right;">     1420</td><td style="text-align: right;">        2</td><td style="text-align: right;">        2</td><td style="text-align: right;">              59</td><td style="text-align: right;">         1103</td><td style="text-align: right;">         626468</td><td>made2_jump </td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+** Players_2015
+#+begin_src python :session :exports both :results output html :eval never-export
+  Players_2015 = pd.read_csv('../input/datafiles/Players_2015.csv')
+  print("size = ", Players_2015.shape)
+  print_df(Players_2015.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (5442, 4)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  PlayerID</th><th style="text-align: right;">  Season</th><th style="text-align: right;">  TeamID</th><th>PlayerName        </th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    626432</td><td style="text-align: right;">    2015</td><td style="text-align: right;">    1101</td><td>ALBRIGHT_CHRISTIAN</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    626433</td><td style="text-align: right;">    2015</td><td style="text-align: right;">    1101</td><td>COOKE_AUSTIN      </td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    626434</td><td style="text-align: right;">    2015</td><td style="text-align: right;">    1101</td><td>GRANT_MICHAEL     </td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    626435</td><td style="text-align: right;">    2015</td><td style="text-align: right;">    1101</td><td>GREEN_DRAKE       </td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    626436</td><td style="text-align: right;">    2015</td><td style="text-align: right;">    1101</td><td>HANSON_DAVID      </td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+* Data Section 6 - Supplements
+** ConferenceTourneyGames
+#+begin_src python :session :exports both :results output html :eval never-export
+  Conference Tourney Games = pd.read_csv('../input/datafiles/ConferenceTourneyGames.csv')
+  print("size = ", Conference Tourney Games.shape)
+  print_df(Conference Tourney Games.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "/tmp/babel-7PnAYV/python-KdmXXV", line 1
+    Conference Tourney Games = pd.read_csv('../input/datafiles/ConferenceTourneyGames.csv')
+                     ^
+SyntaxError: invalid syntax
+#+END_EXPORT
+
+** TeamCoaches
+#+begin_src python :session :exports both :results output html :eval never-export
+  TeamCoaches = pd.read_csv('../input/datafiles/TeamCoaches.csv')
+  print("size = ", TeamCoaches.shape)
+  print_df(TeamCoaches.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (10994, 5)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  Season</th><th style="text-align: right;">  TeamID</th><th style="text-align: right;">  FirstDayNum</th><th style="text-align: right;">  LastDayNum</th><th>CoachName     </th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    1985</td><td style="text-align: right;">    1102</td><td style="text-align: right;">            0</td><td style="text-align: right;">         154</td><td>reggie_minton </td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    1985</td><td style="text-align: right;">    1103</td><td style="text-align: right;">            0</td><td style="text-align: right;">         154</td><td>bob_huggins   </td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    1985</td><td style="text-align: right;">    1104</td><td style="text-align: right;">            0</td><td style="text-align: right;">         154</td><td>wimp_sanderson</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    1985</td><td style="text-align: right;">    1106</td><td style="text-align: right;">            0</td><td style="text-align: right;">         154</td><td>james_oliver  </td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    1985</td><td style="text-align: right;">    1108</td><td style="text-align: right;">            0</td><td style="text-align: right;">         154</td><td>davey_whitney </td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+** Conferences
+#+begin_src python :session :exports both :results output html :eval never-export
+  Conferences = pd.read_csv('../input/datafiles/Conferences.csv')
+  print("size = ", Conferences.shape)
+  print_df(Conferences.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (51, 2)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th>ConfAbbrev  </th><th>Description                 </th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td>a_sun       </td><td>Atlantic Sun Conference     </td></tr>
+<tr><td style="text-align: right;"> 1</td><td>a_ten       </td><td>Atlantic 10 Conference      </td></tr>
+<tr><td style="text-align: right;"> 2</td><td>aac         </td><td>American Athletic Conference</td></tr>
+<tr><td style="text-align: right;"> 3</td><td>acc         </td><td>Atlantic Coast Conference   </td></tr>
+<tr><td style="text-align: right;"> 4</td><td>aec         </td><td>America East Conference     </td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+** TeamConferences
+#+begin_src python :session :exports both :results output html :eval never-export
+  TeamConferences = pd.read_csv('../input/datafiles/TeamConferences.csv')
+  print("size = ", TeamConferences.shape)
+  print_df(TeamConferences.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (11241, 3)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  Season</th><th style="text-align: right;">  TeamID</th><th>ConfAbbrev  </th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    1985</td><td style="text-align: right;">    1114</td><td>a_sun       </td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    1985</td><td style="text-align: right;">    1147</td><td>a_sun       </td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    1985</td><td style="text-align: right;">    1204</td><td>a_sun       </td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    1985</td><td style="text-align: right;">    1209</td><td>a_sun       </td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    1985</td><td style="text-align: right;">    1215</td><td>a_sun       </td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+** SecondaryTourneyTeams
+#+begin_src python :session :exports both :results output html :eval never-export
+  SecondaryTourneyTeams = pd.read_csv('../input/datafiles/SecondaryTourneyTeams.csv')
+  print("size = ", SecondaryTourneyTeams.shape)
+  print_df(SecondaryTourneyTeams.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (1568, 3)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  Season</th><th>SecondaryTourney  </th><th style="text-align: right;">  TeamID</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    1985</td><td>NIT               </td><td style="text-align: right;">    1108</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    1985</td><td>NIT               </td><td style="text-align: right;">    1133</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    1985</td><td>NIT               </td><td style="text-align: right;">    1139</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    1985</td><td>NIT               </td><td style="text-align: right;">    1145</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    1985</td><td>NIT               </td><td style="text-align: right;">    1151</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+** SecondaryTourneyCompactResults
+#+begin_src python :session :exports both :results output html :eval never-export
+  SecondaryTourneyCompactResults = pd.read_csv('../input/datafiles/SecondaryTourneyCompactResults.csv')
+  print("size = ", SecondaryTourneyCompactResults.shape)
+  print_df(SecondaryTourneyCompactResults.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (1551, 9)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  Season</th><th style="text-align: right;">  DayNum</th><th style="text-align: right;">  WTeamID</th><th style="text-align: right;">  WScore</th><th style="text-align: right;">  LTeamID</th><th style="text-align: right;">  LScore</th><th>WLoc  </th><th style="text-align: right;">  NumOT</th><th>SecondaryTourney  </th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    1985</td><td style="text-align: right;">     136</td><td style="text-align: right;">     1151</td><td style="text-align: right;">      67</td><td style="text-align: right;">     1155</td><td style="text-align: right;">      65</td><td>H     </td><td style="text-align: right;">      0</td><td>NIT               </td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    1985</td><td style="text-align: right;">     136</td><td style="text-align: right;">     1153</td><td style="text-align: right;">      77</td><td style="text-align: right;">     1245</td><td style="text-align: right;">      61</td><td>H     </td><td style="text-align: right;">      0</td><td>NIT               </td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    1985</td><td style="text-align: right;">     136</td><td style="text-align: right;">     1201</td><td style="text-align: right;">      79</td><td style="text-align: right;">     1365</td><td style="text-align: right;">      76</td><td>H     </td><td style="text-align: right;">      0</td><td>NIT               </td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    1985</td><td style="text-align: right;">     136</td><td style="text-align: right;">     1231</td><td style="text-align: right;">      79</td><td style="text-align: right;">     1139</td><td style="text-align: right;">      57</td><td>H     </td><td style="text-align: right;">      0</td><td>NIT               </td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    1985</td><td style="text-align: right;">     136</td><td style="text-align: right;">     1249</td><td style="text-align: right;">      78</td><td style="text-align: right;">     1222</td><td style="text-align: right;">      71</td><td>H     </td><td style="text-align: right;">      0</td><td>NIT               </td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+** NCAATourneySlots
+#+begin_src python :session :exports both :results output html :eval never-export
+  NCAATourneySlots = pd.read_csv('../input/datafiles/NCAATourneySlots.csv')
+  print("size = ", NCAATourneySlots.shape)
+  print_df(NCAATourneySlots.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (2184, 4)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  Season</th><th>Slot  </th><th>StrongSeed  </th><th>WeakSeed  </th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    1985</td><td>R1W1  </td><td>W01         </td><td>W16       </td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    1985</td><td>R1W2  </td><td>W02         </td><td>W15       </td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    1985</td><td>R1W3  </td><td>W03         </td><td>W14       </td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    1985</td><td>R1W4  </td><td>W04         </td><td>W13       </td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    1985</td><td>R1W5  </td><td>W05         </td><td>W12       </td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+** NCAATourneySeedRoundSlots
+#+begin_src python :session :exports both :results output html :eval never-export
+  NCAATourneySeedRoundSlots = pd.read_csv('../input/datafiles/NCAATourneySeedRoundSlots.csv')
+  print("size = ", NCAATourneySeedRoundSlots.shape)
+  print_df(NCAATourneySeedRoundSlots.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+size =  (720, 5)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th>Seed  </th><th style="text-align: right;">  GameRound</th><th>GameSlot  </th><th style="text-align: right;">  EarlyDayNum</th><th style="text-align: right;">  LateDayNum</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td>W01   </td><td style="text-align: right;">          1</td><td>R1W1      </td><td style="text-align: right;">          136</td><td style="text-align: right;">         137</td></tr>
+<tr><td style="text-align: right;"> 1</td><td>W01   </td><td style="text-align: right;">          2</td><td>R2W1      </td><td style="text-align: right;">          138</td><td style="text-align: right;">         139</td></tr>
+<tr><td style="text-align: right;"> 2</td><td>W01   </td><td style="text-align: right;">          3</td><td>R3W1      </td><td style="text-align: right;">          143</td><td style="text-align: right;">         144</td></tr>
+<tr><td style="text-align: right;"> 3</td><td>W01   </td><td style="text-align: right;">          4</td><td>R4W1      </td><td style="text-align: right;">          145</td><td style="text-align: right;">         146</td></tr>
+<tr><td style="text-align: right;"> 4</td><td>W01   </td><td style="text-align: right;">          5</td><td>R5WX      </td><td style="text-align: right;">          152</td><td style="text-align: right;">         152</td></tr>
+</tbody>
+</table>
+#+END_EXPORT

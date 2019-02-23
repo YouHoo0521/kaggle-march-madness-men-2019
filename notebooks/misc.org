@@ -1,0 +1,44 @@
+#+OPTIONS: ^:nil toc:nil num:2
+#+BEGIN_EXPORT html
+---
+layout: default
+title: Misc
+---
+#+END_EXPORT
+
+This page contains random off-topic notes for my own sanity.
+
+#+TOC: headlines 2
+
+* Using Org to publish html
+#+begin_src lisp
+  (require 'ox-publish)
+  (setq org-publish-project-alist
+	'(
+
+	  ("org-notebooks"
+	   :base-directory "~/statistics/projects/march_madness/notebooks/"
+	   :base-extension "org"
+	   :publishing-directory "~/statistics/projects/march_madness/docs/"
+	   :recursive t
+	   :publishing-function org-html-publish-to-html
+	   :headline-levels 4
+	   :html-extension "html"
+	   :body-only t ;; only export section between <body> </body>
+	   )
+
+	  ("org-static"
+	   :base-directory "~/statistics/projects/march_madness/notebooks/"
+	   :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
+	   :publishing-directory "~/statistics/projects/march_madness/docs/"
+	   :recursive t
+	   :publishing-function org-publish-attachment
+	   )
+
+	  ("org" :components ("org-notebooks" "org-static"))
+
+	))
+#+end_src
+** References
+- https://orgmode.org/worg/org-tutorials/org-publish-html-tutorial.html
+- https://orgmode.org/worg/org-tutorials/org-jekyll.html
