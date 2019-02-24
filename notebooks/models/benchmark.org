@@ -1,0 +1,198 @@
+#+OPTIONS: ^:nil toc:nil
+#+BEGIN_EXPORT html
+---
+layout: page
+title: Benchmark Models
+---
+#+END_EXPORT
+
+No fancy machine learning models, here. Just a collection of simple
+and intuitive hacks. Later we'll need these benchmarks to understand
+if our fancy models are actually any good.
+
+Quick Summary:
+- tournament seed seem like a decent predictor of who will win ([[LogLoss][LogLoss]])
+- [[When a model is full of itself][probabilities of 0 or 1 can ruin you]]
+
+#+TOC: headlines 2
+
+#+BEGIN_EXPORT html
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      inlineMath: [['$','$']]
+    }
+  });
+</script>
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+#+END_EXPORT
+
+* Setup
+** Load Packages
+#+begin_src python :session
+  import pandas as pd
+  import numpy as np
+  from matplotlib import pyplot as plt
+  import seaborn as sns
+  from tabulate import tabulate
+  from sklearn.metrics import log_loss
+  from sklearn.metrics import roc_curve, auc
+  from src import utils  # see src/ folder in project repo
+  from src.data import make_dataset
+#+end_src
+
+#+RESULTS:
+| 2 | 1 | 0.86666667 | 0.8 | 0.76666667 | 0.73333333 | 0.66666667 | 0.63333333 | 0.6 | 0.56666667 | 0.53333333 | 0.5 | 0.46666667 | 0.43333333 | 0.4 | 0.36666667 | 0.33333333 | 0.3 | 0.26666667 | 0.23333333 | 0.2 | 0.06666667 | 0 |
+
+** Helper Functions
+#+begin_src python :session
+  print_df = utils.create_print_df_fcn(tablefmt='html');
+  show_fig = utils.create_show_fig_fcn(img_dir='models/benchmark/');
+#+end_src
+
+#+RESULTS:
+| 2 | 1 | 0.86666667 | 0.8 | 0.76666667 | 0.73333333 | 0.66666667 | 0.63333333 | 0.6 | 0.56666667 | 0.53333333 | 0.5 | 0.46666667 | 0.43333333 | 0.4 | 0.36666667 | 0.33333333 | 0.3 | 0.26666667 | 0.23333333 | 0.2 | 0.06666667 | 0 |
+
+** Load Data
+#+begin_src python :session :exports both :results output html :eval never-export
+  data = make_dataset.get_train_data_v1()
+  print_df(data.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  season</th><th style="text-align: right;">  daynum</th><th style="text-align: right;">  numot</th><th style="text-align: right;">  tourney</th><th style="text-align: right;">  team1</th><th style="text-align: right;">  team2</th><th style="text-align: right;">  score1</th><th style="text-align: right;">  score2</th><th style="text-align: right;">  loc</th><th style="text-align: right;">  team1win</th><th>seed1  </th><th style="text-align: right;">  seednum1</th><th>seed2  </th><th style="text-align: right;">  seednum2</th><th style="text-align: right;">  seeddiff</th><th style="text-align: right;">            ID</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    1985</td><td style="text-align: right;">      20</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1228</td><td style="text-align: right;">   1328</td><td style="text-align: right;">      81</td><td style="text-align: right;">      64</td><td style="text-align: right;">    0</td><td style="text-align: right;">         1</td><td>W03    </td><td style="text-align: right;">         3</td><td>Y01    </td><td style="text-align: right;">         1</td><td style="text-align: right;">        -2</td><td style="text-align: right;">1985_1228_1328</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    1985</td><td style="text-align: right;">      25</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1106</td><td style="text-align: right;">   1354</td><td style="text-align: right;">      77</td><td style="text-align: right;">      70</td><td style="text-align: right;"> 1106</td><td style="text-align: right;">         1</td><td>nan    </td><td style="text-align: right;">       nan</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">1985_1106_1354</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    1985</td><td style="text-align: right;">      25</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1112</td><td style="text-align: right;">   1223</td><td style="text-align: right;">      63</td><td style="text-align: right;">      56</td><td style="text-align: right;"> 1112</td><td style="text-align: right;">         1</td><td>X10    </td><td style="text-align: right;">        10</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">1985_1112_1223</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    1985</td><td style="text-align: right;">      25</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1165</td><td style="text-align: right;">   1432</td><td style="text-align: right;">      70</td><td style="text-align: right;">      54</td><td style="text-align: right;"> 1165</td><td style="text-align: right;">         1</td><td>nan    </td><td style="text-align: right;">       nan</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">1985_1165_1432</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    1985</td><td style="text-align: right;">      25</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1192</td><td style="text-align: right;">   1447</td><td style="text-align: right;">      86</td><td style="text-align: right;">      74</td><td style="text-align: right;"> 1192</td><td style="text-align: right;">         1</td><td>Z16    </td><td style="text-align: right;">        16</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">1985_1192_1447</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+* Models
+** Constant Model
+$$\text{All teams are created equal}$$
+#+begin_src python :session :exports both :results output :eval never-export
+  models = {}
+  models['constant'] = pd.DataFrame({'ID':data['ID'], 'Pred':0.5})
+#+end_src
+
+#+RESULTS:
+
+** SeedDiff Model 
+$$\text{Higher seeded team is more likely to win}$$
+
+In this model, we use the relative difference in seed to predict the
+winning team. For example,
+- If two teams have equal seeds, they have equal probabilities of
+  winning.
+- If two teams have maximum difference in seeds (i.e. top seed vs
+  bottom seed), then the team with higher (lower value) seed has
+  winning probability of 1.
+
+In math, this is
+$$d_i = \text{difference in seeds for game } i$$
+$$p(win_i) = \frac{d_i - d_{min}}{d_{max} - d_{min}}$$
+
+#+begin_src python :session :exports both :results output :eval never-export
+  models['seeddiff'] = (data.set_index('ID')
+			.pipe(lambda x:
+			      ((x['seeddiff'] - x['seeddiff'].min()) /
+			       (x['seeddiff'].max() - x['seeddiff'].min())))
+			.reset_index()
+			.rename({'seeddiff':'Pred'}, axis=1)
+			.dropna()
+  )
+#+end_src
+
+#+RESULTS:
+
+* Evaluation
+** LogLoss
+#+begin_src python :session :exports both :results output file :eval never-export
+  models_loss = {}
+  for m_name, m in models.items():
+      m_loss = (m.pipe(pd.merge,
+		       data.loc[data.tourney == 1, ['ID', 'team1win', 'season']],
+		       on='ID', how='inner')
+		.groupby('season')
+		.apply(lambda x: log_loss(x['team1win'], x['Pred'])))
+      models_loss[m_name] = m_loss
+  fig, ax = plt.subplots()
+  pd.DataFrame(models_loss).plot(ax=ax)
+  ax.set_title('Log Loss - Benchmark Models')
+  ax.set_ylabel('Log Loss')
+  show_fig('log_loss.png')
+  show_fig
+#+end_src
+
+#+RESULTS:
+[[file:../figs/models/benchmark/log_loss.png]]
+
+*** When a model is full of itself
+There is a huge spike in 2018 season because a 16th seeded team beat
+the top seeded team. In this case, the =SeedDiff Model= predicts a
+winning probability of exactly 0, which would result in an infinite
+log-loss. Fortunately, =sklearn.metrics.log_loss= clips the predicted
+probabilities away from 0 and 1 by a small amount to prevent infinite
+loss. It'd be a good idea to prevent our models from predicting 0 or 1
+probabilities (i.e. pretending to know the outcome with
+certainty).
+
+Here is a query for the game that caused an infinite loss in =SeedDiff Model=.
+#+begin_src python :session :exports both :results output html :eval never-export
+tmp = data[(data.season == 2018) & (data.tourney == 1)]
+print_df(tmp.loc[tmp.seeddiff.abs().sort_values(ascending=False).index].head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+<table>
+<thead>
+<tr><th style="text-align: right;">      </th><th style="text-align: right;">  season</th><th style="text-align: right;">  daynum</th><th style="text-align: right;">  numot</th><th style="text-align: right;">  tourney</th><th style="text-align: right;">  team1</th><th style="text-align: right;">  team2</th><th style="text-align: right;">  score1</th><th style="text-align: right;">  score2</th><th style="text-align: right;">  loc</th><th style="text-align: right;">  team1win</th><th>seed1  </th><th style="text-align: right;">  seednum1</th><th>seed2  </th><th style="text-align: right;">  seednum2</th><th style="text-align: right;">  seeddiff</th><th style="text-align: right;">            ID</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;">158239</td><td style="text-align: right;">    2018</td><td style="text-align: right;">     137</td><td style="text-align: right;">      0</td><td style="text-align: right;">        1</td><td style="text-align: right;">   1420</td><td style="text-align: right;">   1438</td><td style="text-align: right;">      74</td><td style="text-align: right;">      54</td><td style="text-align: right;">    0</td><td style="text-align: right;">         1</td><td>Y16    </td><td style="text-align: right;">        16</td><td>Y01    </td><td style="text-align: right;">         1</td><td style="text-align: right;">       -15</td><td style="text-align: right;">2018_1420_1438</td></tr>
+<tr><td style="text-align: right;">158241</td><td style="text-align: right;">    2018</td><td style="text-align: right;">     137</td><td style="text-align: right;">      0</td><td style="text-align: right;">        1</td><td style="text-align: right;">   1411</td><td style="text-align: right;">   1462</td><td style="text-align: right;">      83</td><td style="text-align: right;">     102</td><td style="text-align: right;">    0</td><td style="text-align: right;">         0</td><td>Z16b   </td><td style="text-align: right;">        16</td><td>Z01    </td><td style="text-align: right;">         1</td><td style="text-align: right;">       -15</td><td style="text-align: right;">2018_1411_1462</td></tr>
+<tr><td style="text-align: right;">158225</td><td style="text-align: right;">    2018</td><td style="text-align: right;">     136</td><td style="text-align: right;">      0</td><td style="text-align: right;">        1</td><td style="text-align: right;">   1347</td><td style="text-align: right;">   1437</td><td style="text-align: right;">      61</td><td style="text-align: right;">      87</td><td style="text-align: right;">    0</td><td style="text-align: right;">         0</td><td>W16b   </td><td style="text-align: right;">        16</td><td>W01    </td><td style="text-align: right;">         1</td><td style="text-align: right;">       -15</td><td style="text-align: right;">2018_1347_1437</td></tr>
+<tr><td style="text-align: right;">158216</td><td style="text-align: right;">    2018</td><td style="text-align: right;">     136</td><td style="text-align: right;">      0</td><td style="text-align: right;">        1</td><td style="text-align: right;">   1242</td><td style="text-align: right;">   1335</td><td style="text-align: right;">      76</td><td style="text-align: right;">      60</td><td style="text-align: right;">    0</td><td style="text-align: right;">         1</td><td>X01    </td><td style="text-align: right;">         1</td><td>X16    </td><td style="text-align: right;">        16</td><td style="text-align: right;">        15</td><td style="text-align: right;">2018_1242_1335</td></tr>
+<tr><td style="text-align: right;">158236</td><td style="text-align: right;">    2018</td><td style="text-align: right;">     137</td><td style="text-align: right;">      0</td><td style="text-align: right;">        1</td><td style="text-align: right;">   1168</td><td style="text-align: right;">   1345</td><td style="text-align: right;">      48</td><td style="text-align: right;">      74</td><td style="text-align: right;">    0</td><td style="text-align: right;">         0</td><td>W15    </td><td style="text-align: right;">        15</td><td>W02    </td><td style="text-align: right;">         2</td><td style="text-align: right;">       -13</td><td style="text-align: right;">2018_1168_1345</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+** COMMENT ROC Curve
+Here is an ROC curve showing the predicted win vs. actual win for the
+lower ID team.
+#+begin_src python :session :exports both :results output file :eval never-export
+  fpr = {}
+  tpr = {}
+  roc_auc = {}
+  m_eval = models['seeddiff'].pipe(pd.merge,
+				   data.loc[data.tourney == 1, ['ID', 'team1win', 'season']],
+				   on='ID', how='inner')
+  fig, ax = plt.subplots()
+  for season, m_season in m_eval.groupby('season'):
+      fpr[season], tpr[season], _ = roc_curve(m_season['team1win'],
+					      m_season['Pred'])
+      roc_auc[season] = auc(fpr[season], tpr[season])
+      ax.plot(fpr[season], tpr[season], 'r--', lw=0.5)
+      ax.set_xlabel('False Positive Rate')
+      ax.set_ylabel('True Positive Rate')
+      ax.set_title('ROC Curve - SeedDiff Model')
+  show_fig('roc.png')
+#+end_src
+
+#+RESULTS:
+[[file:../figs/models/benchmark/roc.png]]
+
+*** Note to self
+I don't think ROC curve is useful for this problem because there's no
+reason to vary the threshold for classification.
