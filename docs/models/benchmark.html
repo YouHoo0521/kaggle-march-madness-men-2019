@@ -1,0 +1,238 @@
+---
+layout: page
+title: Benchmark Models
+---
+
+<p>
+No fancy machine learning models, here. Just a collection of simple
+and intuitive hacks. Later we'll need these benchmarks to understand
+if our fancy models are actually any good.
+</p>
+
+<p>
+Quick Summary:
+</p>
+<ul class="org-ul">
+<li>tournament seed seem like a decent predictor of who will win (<a href="#org300a0b3">LogLoss</a>)</li>
+<li><a href="#org898f963">probabilities of 0 or 1 can ruin you</a></li>
+</ul>
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgb3306e8">1. Setup</a>
+<ul>
+<li><a href="#org1aae116">1.1. Load Packages</a></li>
+<li><a href="#org822c28c">1.2. Helper Functions</a></li>
+<li><a href="#orgd6d412e">1.3. Load Data</a></li>
+</ul>
+</li>
+<li><a href="#org4630b1c">2. Models</a>
+<ul>
+<li><a href="#orga6337b2">2.1. Constant Model</a></li>
+<li><a href="#orgf07c8a5">2.2. SeedDiff Model</a></li>
+</ul>
+</li>
+<li><a href="#org34de3a6">3. Evaluation</a>
+<ul>
+<li><a href="#org300a0b3">3.1. LogLoss</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      inlineMath: [['$','$']]
+    }
+  });
+</script>
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
+<div id="outline-container-orgb3306e8" class="outline-2">
+<h2 id="orgb3306e8"><span class="section-number-2">1</span> Setup</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-org1aae116" class="outline-3">
+<h3 id="org1aae116"><span class="section-number-3">1.1</span> Load Packages</h3>
+<div class="outline-text-3" id="text-1-1">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a020f0;">import</span> pandas <span style="color: #a020f0;">as</span> pd
+<span style="color: #a020f0;">import</span> numpy <span style="color: #a020f0;">as</span> np
+<span style="color: #a020f0;">from</span> matplotlib <span style="color: #a020f0;">import</span> pyplot <span style="color: #a020f0;">as</span> plt
+<span style="color: #a020f0;">import</span> seaborn <span style="color: #a020f0;">as</span> sns
+<span style="color: #a020f0;">from</span> tabulate <span style="color: #a020f0;">import</span> tabulate
+<span style="color: #a020f0;">from</span> sklearn.metrics <span style="color: #a020f0;">import</span> log_loss
+<span style="color: #a020f0;">from</span> sklearn.metrics <span style="color: #a020f0;">import</span> roc_curve, auc
+<span style="color: #a020f0;">from</span> src <span style="color: #a020f0;">import</span> utils  <span style="color: #b22222;"># </span><span style="color: #b22222;">see src/ folder in project repo</span>
+<span style="color: #a020f0;">from</span> src.data <span style="color: #a020f0;">import</span> make_dataset
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org822c28c" class="outline-3">
+<h3 id="org822c28c"><span class="section-number-3">1.2</span> Helper Functions</h3>
+<div class="outline-text-3" id="text-1-2">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">print_df</span> = utils.create_print_df_fcn(tablefmt=<span style="color: #8b2252;">'orgtbl'</span>);
+<span style="color: #a0522d;">show_fig</span> = utils.create_show_fig_fcn(img_dir=<span style="color: #8b2252;">'models/benchmark/'</span>);
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgd6d412e" class="outline-3">
+<h3 id="orgd6d412e"><span class="section-number-3">1.3</span> Load Data</h3>
+<div class="outline-text-3" id="text-1-3">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">data</span> = make_dataset.get_train_data_v1()
+print_df(data.head())
+</pre>
+</div>
+
+<pre class="example">
+|    |   season |   daynum |   numot |   tourney |   team1 |   team2 |   score1 |   score2 |   loc |   team1win | seed1   |   seednum1 | seed2   |   seednum2 |   seeddiff |             ID |
+|----+----------+----------+---------+-----------+---------+---------+----------+----------+-------+------------+---------+------------+---------+------------+------------+----------------|
+|  0 |     1985 |       20 |       0 |         0 |    1228 |    1328 |       81 |       64 |     0 |          1 | W03     |          3 | Y01     |          1 |         -2 | 1985_1228_1328 |
+|  1 |     1985 |       25 |       0 |         0 |    1106 |    1354 |       77 |       70 |  1106 |          1 | nan     |        nan | nan     |        nan |        nan | 1985_1106_1354 |
+|  2 |     1985 |       25 |       0 |         0 |    1112 |    1223 |       63 |       56 |  1112 |          1 | X10     |         10 | nan     |        nan |        nan | 1985_1112_1223 |
+|  3 |     1985 |       25 |       0 |         0 |    1165 |    1432 |       70 |       54 |  1165 |          1 | nan     |        nan | nan     |        nan |        nan | 1985_1165_1432 |
+|  4 |     1985 |       25 |       0 |         0 |    1192 |    1447 |       86 |       74 |  1192 |          1 | Z16     |         16 | nan     |        nan |        nan | 1985_1192_1447 |
+
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org4630b1c" class="outline-2">
+<h2 id="org4630b1c"><span class="section-number-2">2</span> Models</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orga6337b2" class="outline-3">
+<h3 id="orga6337b2"><span class="section-number-3">2.1</span> Constant Model</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+\[\text{All teams are created equal}\]
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">models</span> = {}
+<span style="color: #a0522d;">models</span>[<span style="color: #8b2252;">'constant'</span>] = pd.DataFrame({<span style="color: #8b2252;">'ID'</span>:data[<span style="color: #8b2252;">'ID'</span>], <span style="color: #8b2252;">'Pred'</span>:0.5})
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgf07c8a5" class="outline-3">
+<h3 id="orgf07c8a5"><span class="section-number-3">2.2</span> SeedDiff Model</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+\[\text{Higher seeded team is more likely to win}\]
+</p>
+
+<p>
+In this model, we use the relative difference in seed to predict the
+winning team. For example,
+</p>
+<ul class="org-ul">
+<li>If two teams have equal seeds, they have equal probabilities of
+winning.</li>
+<li>If two teams have maximum difference in seeds (i.e. top seed vs
+bottom seed), then the team with higher (lower value) seed has
+winning probability of 1.</li>
+</ul>
+
+<p>
+In math, this is
+\[d_i = \text{difference in seeds for game } i\]
+\[p(win_i) = \frac{d_i - d_{min}}{d_{max} - d_{min}}\]
+</p>
+
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">models</span>[<span style="color: #8b2252;">'seeddiff'</span>] = (data.set_index(<span style="color: #8b2252;">'ID'</span>)
+                      .pipe(<span style="color: #a020f0;">lambda</span> x:
+                            ((x[<span style="color: #8b2252;">'seeddiff'</span>] - x[<span style="color: #8b2252;">'seeddiff'</span>].<span style="color: #483d8b;">min</span>()) /
+                             (x[<span style="color: #8b2252;">'seeddiff'</span>].<span style="color: #483d8b;">max</span>() - x[<span style="color: #8b2252;">'seeddiff'</span>].<span style="color: #483d8b;">min</span>())))
+                      .reset_index()
+                      .rename({<span style="color: #8b2252;">'seeddiff'</span>:<span style="color: #8b2252;">'Pred'</span>}, axis=1)
+                      .dropna()
+)
+</pre>
+</div>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org34de3a6" class="outline-2">
+<h2 id="org34de3a6"><span class="section-number-2">3</span> Evaluation</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org300a0b3" class="outline-3">
+<h3 id="org300a0b3"><span class="section-number-3">3.1</span> LogLoss</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">models_loss</span> = {}
+<span style="color: #a020f0;">for</span> m_name, m <span style="color: #a020f0;">in</span> models.items():
+<span style="background-color: #f2f2f2;"> </span>   <span style="color: #a0522d;">m_loss</span> = (m.pipe(pd.merge,
+                     data.loc[data.tourney == 1, [<span style="color: #8b2252;">'ID'</span>, <span style="color: #8b2252;">'team1win'</span>, <span style="color: #8b2252;">'season'</span>]],
+                     on=<span style="color: #8b2252;">'ID'</span>, how=<span style="color: #8b2252;">'inner'</span>)
+              .groupby(<span style="color: #8b2252;">'season'</span>)
+              .<span style="color: #483d8b;">apply</span>(<span style="color: #a020f0;">lambda</span> x: log_loss(x[<span style="color: #8b2252;">'team1win'</span>], x[<span style="color: #8b2252;">'Pred'</span>])))
+<span style="background-color: #f2f2f2;"> </span>   <span style="color: #a0522d;">models_loss</span>[m_name] = m_loss
+<span style="color: #a0522d;">fig</span>, <span style="color: #a0522d;">ax</span> = plt.subplots()
+pd.DataFrame(models_loss).plot(ax=ax)
+ax.set_title(<span style="color: #8b2252;">'Log Loss - Benchmark Models'</span>)
+ax.set_ylabel(<span style="color: #8b2252;">'Log Loss'</span>)
+show_fig(<span style="color: #8b2252;">'log_loss.png'</span>)
+show_fig
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="../figs/models/benchmark/log_loss.png" alt="log_loss.png" />
+</p>
+</div>
+</div>
+
+<div id="outline-container-org898f963" class="outline-4">
+<h4 id="org898f963"><span class="section-number-4">3.1.1</span> When a model is full of itself</h4>
+<div class="outline-text-4" id="text-3-1-1">
+<p>
+There is a huge spike in 2018 season because a 16th seeded team beat
+the top seeded team. In this case, the <code>SeedDiff Model</code> predicts a
+winning probability of exactly 0, which would result in an infinite
+log-loss. Fortunately, <code>sklearn.metrics.log_loss</code> clips the predicted
+probabilities away from 0 and 1 by a small amount to prevent infinite
+loss. It'd be a good idea to prevent our models from predicting 0 or 1
+probabilities (i.e. pretending to know the outcome with
+certainty).
+</p>
+
+<p>
+Here is a query for the game that caused an infinite loss in <code>SeedDiff Model</code>.
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">tmp</span> = data[(data.season == 2018) &amp; (data.tourney == 1)]
+print_df(tmp.loc[tmp.seeddiff.<span style="color: #483d8b;">abs</span>().sort_values(ascending=<span style="color: #008b8b;">False</span>).index].head())
+</pre>
+</div>
+
+<pre class="example">
+|        |   season |   daynum |   numot |   tourney |   team1 |   team2 |   score1 |   score2 |   loc |   team1win | seed1   |   seednum1 | seed2   |   seednum2 |   seeddiff |             ID |
+|--------+----------+----------+---------+-----------+---------+---------+----------+----------+-------+------------+---------+------------+---------+------------+------------+----------------|
+| 158239 |     2018 |      137 |       0 |         1 |    1420 |    1438 |       74 |       54 |     0 |          1 | Y16     |         16 | Y01     |          1 |        -15 | 2018_1420_1438 |
+| 158241 |     2018 |      137 |       0 |         1 |    1411 |    1462 |       83 |      102 |     0 |          0 | Z16b    |         16 | Z01     |          1 |        -15 | 2018_1411_1462 |
+| 158225 |     2018 |      136 |       0 |         1 |    1347 |    1437 |       61 |       87 |     0 |          0 | W16b    |         16 | W01     |          1 |        -15 | 2018_1347_1437 |
+| 158216 |     2018 |      136 |       0 |         1 |    1242 |    1335 |       76 |       60 |     0 |          1 | X01     |          1 | X16     |         16 |         15 | 2018_1242_1335 |
+| 158236 |     2018 |      137 |       0 |         1 |    1168 |    1345 |       48 |       74 |     0 |          0 | W15     |         15 | W02     |          2 |        -13 | 2018_1168_1345 |
+
+</pre>
+</div>
+</div>
+</div>
+</div>
