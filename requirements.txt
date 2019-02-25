@@ -10,3 +10,4 @@ tabulate
 seaborn
 pystan
 sklearn
+statsmodels
