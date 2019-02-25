@@ -1,0 +1,355 @@
+---
+layout: page
+title: EDA - Season 2015
+---
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgd54cf0b">1. Motivation</a></li>
+<li><a href="#org7fdc90e">2. Setup</a>
+<ul>
+<li><a href="#orga66c3f4">2.1. Load Packages</a></li>
+<li><a href="#org3deac6d">2.2. Helper Functions</a></li>
+<li><a href="#orgeac4f48">2.3. Load Data</a></li>
+<li><a href="#orgb0bc40b">2.4. Basic Description</a></li>
+</ul>
+</li>
+<li><a href="#orgcd19eea">3. Visualizations</a>
+<ul>
+<li><a href="#org9794a4e">3.1. Distribution of points from each team</a></li>
+<li><a href="#org37b39da">3.2. Proportion of win by difference in seeds</a></li>
+<li><a href="#orgf2ee695">3.3. Difference in scores by difference in seeds</a></li>
+<li><a href="#org3e1333e">3.4. Win vs. difference in seeds</a></li>
+<li><a href="#orgc8e867b">3.5. Distribution of winning vs. losing points</a></li>
+<li><a href="#orgafab0bb">3.6. Distribution of score difference by losing team's points</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      inlineMath: [['$','$']]
+    }
+  });
+</script>
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
+<div id="outline-container-orgd54cf0b" class="outline-2">
+<h2 id="orgd54cf0b"><span class="section-number-2">1</span> Motivation</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Here we explore the data from 2015 season. 2015 was chosen arbitrarily
+among recent years. There's a few reasons for visualizing a single
+season at a time.
+</p>
+
+<ul class="org-ul">
+<li>It keeps the code simple. We can later write functions to do the
+same for the other seasons or multiple seasons combined.</li>
+<li><p>
+It reflects my general modeling approach: Stay simple until there
+are reasons not to.
+</p>
+
+<p>
+Our main goal is to predict the outcomes of the 2019
+tournament. Regular season results from 2019 season might help us
+with this prediction, but it's not clear what information can be
+gained from previous seasons, given that the roster goes through a
+significant change each season.  For instance, what can we actually
+learn from the 2000 season that can help us predict the outcomes of
+the 2019 tournament? Not that useful information can't be shared
+across seasons, but we'll explore the incremental benefits of using
+larger datasets and more complicated models.
+</p>
+
+<p>
+Focusing on a single season at a time helps us retain simplicity and
+interpretability. The goal, of course, is to expand our models, and
+we'll do that in a way that helps us gain insight about the problem
+domain.
+</p></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-org7fdc90e" class="outline-2">
+<h2 id="org7fdc90e"><span class="section-number-2">2</span> Setup</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orga66c3f4" class="outline-3">
+<h3 id="orga66c3f4"><span class="section-number-3">2.1</span> Load Packages</h3>
+<div class="outline-text-3" id="text-2-1">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a020f0;">import</span> pandas <span style="color: #a020f0;">as</span> pd
+<span style="color: #a020f0;">import</span> numpy <span style="color: #a020f0;">as</span> np
+<span style="color: #a020f0;">from</span> matplotlib <span style="color: #a020f0;">import</span> pyplot <span style="color: #a020f0;">as</span> plt
+<span style="color: #a020f0;">import</span> seaborn <span style="color: #a020f0;">as</span> sns
+<span style="color: #a020f0;">from</span> tabulate <span style="color: #a020f0;">import</span> tabulate
+<span style="color: #a020f0;">from</span> src <span style="color: #a020f0;">import</span> utils  <span style="color: #b22222;"># </span><span style="color: #b22222;">see src/ folder in project repo</span>
+<span style="color: #a020f0;">from</span> src.data <span style="color: #a020f0;">import</span> make_dataset
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org3deac6d" class="outline-3">
+<h3 id="org3deac6d"><span class="section-number-3">2.2</span> Helper Functions</h3>
+<div class="outline-text-3" id="text-2-2">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">print_df</span> = utils.create_print_df_fcn(tablefmt=<span style="color: #8b2252;">'html'</span>);
+<span style="color: #a0522d;">show_fig</span> = utils.create_show_fig_fcn(img_dir=<span style="color: #8b2252;">'eda/eda_2015/'</span>);
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgeac4f48" class="outline-3">
+<h3 id="orgeac4f48"><span class="section-number-3">2.3</span> Load Data</h3>
+<div class="outline-text-3" id="text-2-3">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">data</span> = make_dataset.get_train_data_v1(season=2015)
+<span style="color: #b22222;"># </span><span style="color: #b22222;">difference in scores</span>
+<span style="color: #a0522d;">data</span>[<span style="color: #8b2252;">'scorediff'</span>] = data[<span style="color: #8b2252;">'score1'</span>] - data[<span style="color: #8b2252;">'score2'</span>]
+<span style="color: #b22222;"># </span><span style="color: #b22222;">winning and losing scores</span>
+<span style="color: #a0522d;">data</span>[<span style="color: #8b2252;">'score_w'</span>] = np.where(data.team1win == 1, data.score1, data.score2)
+<span style="color: #a0522d;">data</span>[<span style="color: #8b2252;">'score_l'</span>] = np.where(data.team1win == 0, data.score1, data.score2)
+<span style="color: #a020f0;">print</span>(<span style="color: #8b2252;">'Data size = {}'</span>.<span style="color: #483d8b;">format</span>(data.shape))
+print_df(data.head())
+</pre>
+</div>
+
+Data size = (5421, 19)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  season</th><th style="text-align: right;">  daynum</th><th style="text-align: right;">  numot</th><th style="text-align: right;">  tourney</th><th style="text-align: right;">  team1</th><th style="text-align: right;">  team2</th><th style="text-align: right;">  score1</th><th style="text-align: right;">  score2</th><th style="text-align: right;">  loc</th><th style="text-align: right;">  team1win</th><th>seed1  </th><th style="text-align: right;">  seednum1</th><th style="text-align: right;">  seed2</th><th style="text-align: right;">  seednum2</th><th style="text-align: right;">  seeddiff</th><th style="text-align: right;">            ID</th><th style="text-align: right;">  scorediff</th><th style="text-align: right;">  score_w</th><th style="text-align: right;">  score_l</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1103</td><td style="text-align: right;">   1420</td><td style="text-align: right;">      74</td><td style="text-align: right;">      57</td><td style="text-align: right;"> 1103</td><td style="text-align: right;">         1</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1103_1420</td><td style="text-align: right;">         17</td><td style="text-align: right;">       74</td><td style="text-align: right;">       57</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1104</td><td style="text-align: right;">   1406</td><td style="text-align: right;">      82</td><td style="text-align: right;">      54</td><td style="text-align: right;"> 1104</td><td style="text-align: right;">         1</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1104_1406</td><td style="text-align: right;">         28</td><td style="text-align: right;">       82</td><td style="text-align: right;">       54</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1112</td><td style="text-align: right;">   1291</td><td style="text-align: right;">      78</td><td style="text-align: right;">      55</td><td style="text-align: right;"> 1112</td><td style="text-align: right;">         1</td><td>Z02    </td><td style="text-align: right;">         2</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1112_1291</td><td style="text-align: right;">         23</td><td style="text-align: right;">       78</td><td style="text-align: right;">       55</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1113</td><td style="text-align: right;">   1152</td><td style="text-align: right;">      86</td><td style="text-align: right;">      50</td><td style="text-align: right;"> 1113</td><td style="text-align: right;">         1</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1113_1152</td><td style="text-align: right;">         36</td><td style="text-align: right;">       86</td><td style="text-align: right;">       50</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1102</td><td style="text-align: right;">   1119</td><td style="text-align: right;">      78</td><td style="text-align: right;">      84</td><td style="text-align: right;"> 1119</td><td style="text-align: right;">         0</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1102_1119</td><td style="text-align: right;">         -6</td><td style="text-align: right;">       84</td><td style="text-align: right;">       78</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="outline-container-orgb0bc40b" class="outline-3">
+<h3 id="orgb0bc40b"><span class="section-number-3">2.4</span> Basic Description</h3>
+<div class="outline-text-3" id="text-2-4">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">n_missing</span> = data.isna().<span style="color: #483d8b;">sum</span>().rename(<span style="color: #8b2252;">'n_missing'</span>)
+print_df(data.describe().append(n_missing))
+</pre>
+</div>
+
+<table>
+<thead>
+<tr><th>         </th><th style="text-align: right;">  season</th><th style="text-align: right;">   daynum</th><th style="text-align: right;">       numot</th><th style="text-align: right;">     tourney</th><th style="text-align: right;">    team1</th><th style="text-align: right;">    team2</th><th style="text-align: right;">   score1</th><th style="text-align: right;">   score2</th><th style="text-align: right;">   team1win</th><th style="text-align: right;">  seednum1</th><th style="text-align: right;">  seednum2</th><th style="text-align: right;">   seeddiff</th><th style="text-align: right;">  scorediff</th><th style="text-align: right;">  score_w</th><th style="text-align: right;">  score_l</th><th style="text-align: right;">  ID</th><th style="text-align: right;">  loc</th><th style="text-align: right;">  seed1</th><th style="text-align: right;">  seed2</th></tr>
+</thead>
+<tbody>
+<tr><td>count    </td><td style="text-align: right;">    5421</td><td style="text-align: right;">5421     </td><td style="text-align: right;">5421        </td><td style="text-align: right;">5421        </td><td style="text-align: right;">5421     </td><td style="text-align: right;">5421     </td><td style="text-align: right;">5421     </td><td style="text-align: right;">5421     </td><td style="text-align: right;">5421       </td><td style="text-align: right;">1166      </td><td style="text-align: right;">1161      </td><td style="text-align: right;"> 376       </td><td style="text-align: right;">5421       </td><td style="text-align: right;">5421     </td><td style="text-align: right;">5421     </td><td style="text-align: right;"> nan</td><td style="text-align: right;">  nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">    nan</td></tr>
+<tr><td>mean     </td><td style="text-align: right;">    2015</td><td style="text-align: right;">  71.5853</td><td style="text-align: right;">   0.0791367</td><td style="text-align: right;">   0.0123593</td><td style="text-align: right;">1224.32  </td><td style="text-align: right;">1343.95  </td><td style="text-align: right;">  66.3785</td><td style="text-align: right;">  67.3331</td><td style="text-align: right;">   0.472607</td><td style="text-align: right;">   8.57719</td><td style="text-align: right;">   8.62532</td><td style="text-align: right;">   0.361702</td><td style="text-align: right;">  -0.954621</td><td style="text-align: right;">  72.6838</td><td style="text-align: right;">  61.0279</td><td style="text-align: right;"> nan</td><td style="text-align: right;">  nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">    nan</td></tr>
+<tr><td>std      </td><td style="text-align: right;">       0</td><td style="text-align: right;">  36.0027</td><td style="text-align: right;">   0.326858 </td><td style="text-align: right;">   0.110494 </td><td style="text-align: right;">  85.1581</td><td style="text-align: right;">  84.8386</td><td style="text-align: right;">  12.0862</td><td style="text-align: right;">  11.9573</td><td style="text-align: right;">   0.499295</td><td style="text-align: right;">   4.77696</td><td style="text-align: right;">   4.60865</td><td style="text-align: right;">   5.70773 </td><td style="text-align: right;">  14.6983  </td><td style="text-align: right;">  10.541 </td><td style="text-align: right;">  10.5097</td><td style="text-align: right;"> nan</td><td style="text-align: right;">  nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">    nan</td></tr>
+<tr><td>min      </td><td style="text-align: right;">    2015</td><td style="text-align: right;">  11     </td><td style="text-align: right;">   0        </td><td style="text-align: right;">   0        </td><td style="text-align: right;">1101     </td><td style="text-align: right;">1106     </td><td style="text-align: right;">  26     </td><td style="text-align: right;">  26     </td><td style="text-align: right;">   0       </td><td style="text-align: right;">   1      </td><td style="text-align: right;">   1      </td><td style="text-align: right;"> -15       </td><td style="text-align: right;"> -62       </td><td style="text-align: right;">  38     </td><td style="text-align: right;">  26     </td><td style="text-align: right;"> nan</td><td style="text-align: right;">  nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">    nan</td></tr>
+<tr><td>25%      </td><td style="text-align: right;">    2015</td><td style="text-align: right;">  40     </td><td style="text-align: right;">   0        </td><td style="text-align: right;">   0        </td><td style="text-align: right;">1154     </td><td style="text-align: right;">1285     </td><td style="text-align: right;">  58     </td><td style="text-align: right;">  59     </td><td style="text-align: right;">   0       </td><td style="text-align: right;">   4      </td><td style="text-align: right;">   5      </td><td style="text-align: right;">  -3       </td><td style="text-align: right;"> -10       </td><td style="text-align: right;">  65     </td><td style="text-align: right;">  54     </td><td style="text-align: right;"> nan</td><td style="text-align: right;">  nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">    nan</td></tr>
+<tr><td>50%      </td><td style="text-align: right;">    2015</td><td style="text-align: right;">  74     </td><td style="text-align: right;">   0        </td><td style="text-align: right;">   0        </td><td style="text-align: right;">1210     </td><td style="text-align: right;">1359     </td><td style="text-align: right;">  66     </td><td style="text-align: right;">  67     </td><td style="text-align: right;">   0       </td><td style="text-align: right;">   9      </td><td style="text-align: right;">   9      </td><td style="text-align: right;">   0       </td><td style="text-align: right;">  -2       </td><td style="text-align: right;">  72     </td><td style="text-align: right;">  61     </td><td style="text-align: right;"> nan</td><td style="text-align: right;">  nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">    nan</td></tr>
+<tr><td>75%      </td><td style="text-align: right;">    2015</td><td style="text-align: right;"> 103     </td><td style="text-align: right;">   0        </td><td style="text-align: right;">   0        </td><td style="text-align: right;">1281     </td><td style="text-align: right;">1414     </td><td style="text-align: right;">  74     </td><td style="text-align: right;">  75     </td><td style="text-align: right;">   1       </td><td style="text-align: right;">  13      </td><td style="text-align: right;">  12      </td><td style="text-align: right;">   4       </td><td style="text-align: right;">   9       </td><td style="text-align: right;">  79     </td><td style="text-align: right;">  68     </td><td style="text-align: right;"> nan</td><td style="text-align: right;">  nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">    nan</td></tr>
+<tr><td>max      </td><td style="text-align: right;">    2015</td><td style="text-align: right;"> 154     </td><td style="text-align: right;">   4        </td><td style="text-align: right;">   1        </td><td style="text-align: right;">1460     </td><td style="text-align: right;">1464     </td><td style="text-align: right;"> 116     </td><td style="text-align: right;"> 126     </td><td style="text-align: right;">   1       </td><td style="text-align: right;">  16      </td><td style="text-align: right;">  16      </td><td style="text-align: right;">  15       </td><td style="text-align: right;">  69       </td><td style="text-align: right;"> 126     </td><td style="text-align: right;"> 111     </td><td style="text-align: right;"> nan</td><td style="text-align: right;">  nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">    nan</td></tr>
+<tr><td>n_missing</td><td style="text-align: right;">       0</td><td style="text-align: right;">   0     </td><td style="text-align: right;">   0        </td><td style="text-align: right;">   0        </td><td style="text-align: right;">   0     </td><td style="text-align: right;">   0     </td><td style="text-align: right;">   0     </td><td style="text-align: right;">   0     </td><td style="text-align: right;">   0       </td><td style="text-align: right;">4255      </td><td style="text-align: right;">4260      </td><td style="text-align: right;">5045       </td><td style="text-align: right;">   0       </td><td style="text-align: right;">   0     </td><td style="text-align: right;">   0     </td><td style="text-align: right;">   0</td><td style="text-align: right;">    0</td><td style="text-align: right;">   4255</td><td style="text-align: right;">   4260</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgcd19eea" class="outline-2">
+<h2 id="orgcd19eea"><span class="section-number-2">3</span> Visualizations</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org9794a4e" class="outline-3">
+<h3 id="org9794a4e"><span class="section-number-3">3.1</span> Distribution of points from each team</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">fig</span>, <span style="color: #a0522d;">axes</span> = plt.subplots(2, 2, figsize=(8, 8), sharex=<span style="color: #008b8b;">True</span>, sharey=<span style="color: #008b8b;">True</span>)
+<span style="color: #a020f0;">for</span> i, (is_tourney, df) <span style="color: #a020f0;">in</span> <span style="color: #483d8b;">enumerate</span>(data.groupby(<span style="color: #8b2252;">'tourney'</span>)):
+<span style="background-color: #f2f2f2;"> </span>   <span style="color: #a0522d;">color</span> = <span style="color: #8b2252;">'#1f77b4'</span> <span style="color: #a020f0;">if</span> is_tourney == 0 <span style="color: #a020f0;">else</span> <span style="color: #8b2252;">'#ff7f0e'</span>
+<span style="background-color: #f2f2f2;"> </span>   axes[i,0].scatter(df.score1, df.score2, s=1, c=color)
+<span style="background-color: #f2f2f2;"> </span>   axes[i,1].hexbin(df.score1, df.score2, bins=<span style="color: #8b2252;">'log'</span>, gridsize=50)
+<span style="background-color: #f2f2f2;"> </span>   <span style="color: #a0522d;">lims</span> = [20, 125]
+<span style="background-color: #f2f2f2;"> </span>   axes[i,0].set_ylabel(<span style="color: #8b2252;">'Team 2 Score ({})'</span>.<span style="color: #483d8b;">format</span>(<span style="color: #8b2252;">'Regular'</span> <span style="color: #a020f0;">if</span> is_tourney == 0 <span style="color: #a020f0;">else</span> <span style="color: #8b2252;">'Tourney'</span>))
+<span style="background-color: #f2f2f2;"> </span>   axes[i,1].set_xlim(lims)
+<span style="background-color: #f2f2f2;"> </span>   axes[i,1].set_ylim(lims)
+<span style="background-color: #f2f2f2;"> </span>   <span style="color: #a020f0;">for</span> j <span style="color: #a020f0;">in</span> <span style="color: #483d8b;">range</span>(2):
+<span style="background-color: #f2f2f2;"> </span>   <span style="background-color: #f2f2f2;"> </span> axes[i,j].plot(lims, lims, c=<span style="color: #8b2252;">'r'</span>, lw=0.5)
+axes[1,0].set_xlabel(<span style="color: #8b2252;">'Team 1 Score'</span>)
+axes[1,1].set_xlabel(<span style="color: #8b2252;">'Team 1 Score'</span>)
+plt.subplots_adjust(left=<span style="color: #008b8b;">None</span>, bottom=<span style="color: #008b8b;">None</span>, right=<span style="color: #008b8b;">None</span>, top=<span style="color: #008b8b;">None</span>, wspace=0.05, hspace=0.05)
+plt.suptitle(<span style="color: #8b2252;">'Bivariate Distribution of Points'</span>)
+show_fig(<span style="color: #8b2252;">'scatter_points.png'</span>)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="../figs/eda/eda_2015/scatter_points.png" alt="scatter_points.png" />
+</p>
+</div>
+
+<p>
+An initial look at the distribution of points scored by team 1 (with
+lower ID) and team 2 (with higher ID). As expected, there's nothing
+special here which means that team IDs are probably assigned
+arbitrarily.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org37b39da" class="outline-3">
+<h3 id="org37b39da"><span class="section-number-3">3.2</span> Proportion of win by difference in seeds</h3>
+<div class="outline-text-3" id="text-3-2">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">df_tmp</span> = data.groupby([<span style="color: #8b2252;">'tourney'</span>, <span style="color: #8b2252;">'seeddiff'</span>])[<span style="color: #8b2252;">'team1win'</span>].agg([<span style="color: #8b2252;">'sum'</span>, <span style="color: #8b2252;">'size'</span>]).reset_index()
+<span style="color: #a0522d;">fig</span>, <span style="color: #a0522d;">axes</span> = plt.subplots(2, 1, figsize = (7, 10), sharex=<span style="color: #008b8b;">True</span>)
+<span style="color: #a020f0;">for</span> i, (is_tourney, df) <span style="color: #a020f0;">in</span> <span style="color: #483d8b;">enumerate</span>(df_tmp.groupby(<span style="color: #8b2252;">'tourney'</span>)):
+<span style="background-color: #f2f2f2;"> </span>   axes[i].bar(df.seeddiff, df[<span style="color: #8b2252;">'size'</span>], label=<span style="color: #8b2252;">'Loss'</span>)
+<span style="background-color: #f2f2f2;"> </span>   axes[i].bar(df.seeddiff, df[<span style="color: #8b2252;">'sum'</span>], label=<span style="color: #8b2252;">'Win'</span>)
+<span style="background-color: #f2f2f2;"> </span>   axes[i].set_title(<span style="color: #8b2252;">'Regular'</span> <span style="color: #a020f0;">if</span> is_tourney == 0 <span style="color: #a020f0;">else</span> <span style="color: #8b2252;">'Tourney'</span>)
+axes[1].set_xlabel(<span style="color: #8b2252;">'Difference in Seeds'</span>)
+<span style="color: #a0522d;">handles</span>, <span style="color: #a0522d;">labels</span> = axes[0].get_legend_handles_labels()
+fig.legend(handles, labels, loc=<span style="color: #8b2252;">'right'</span>)
+show_fig(<span style="color: #8b2252;">'bar_win_by_seeddiff.png'</span>)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="../figs/eda/eda_2015/bar_win_by_seeddiff.png" alt="bar_win_by_seeddiff.png" />
+</p>
+</div>
+
+<p>
+This figure shows the result of the games between seeded teams. Win,
+loss, and difference in seeds are from the perspective of team 1, or
+the team with the lower ID. For example, there were 3 tournament games
+in which team 1 was the underdog by 15 seed points, and all resulted
+in a loss. There were also two upsets in the tournament in which teams
+who had 11 seed point advantage lost the game.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgf2ee695" class="outline-3">
+<h3 id="orgf2ee695"><span class="section-number-3">3.3</span> Difference in scores by difference in seeds</h3>
+<div class="outline-text-3" id="text-3-3">
+<div class="org-src-container">
+<pre class="src src-python">sns.lmplot(x=<span style="color: #8b2252;">'seeddiff'</span>, y=<span style="color: #8b2252;">'scorediff'</span>, hue=<span style="color: #8b2252;">'tourney'</span>, data=data, aspect=1.5)
+show_fig(<span style="color: #8b2252;">'scatter_scorediff_by_seeddiff.png'</span>)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="../figs/eda/eda_2015/scatter_scorediff_by_seeddiff.png" alt="scatter_scorediff_by_seeddiff.png" />
+</p>
+</div>
+
+<p>
+There isn't a huge difference, but the slope between <code>scorediff</code> and
+<code>seeddiff</code> is less steep for the tournament games. This means that the
+games tend to be closer in the tournament than regular season,
+controlling for the difference in seeds. The difference in slopes
+might be used to quantify the increase in competitiveness in the
+tournament.
+</p>
+</div>
+</div>
+
+<div id="outline-container-org3e1333e" class="outline-3">
+<h3 id="org3e1333e"><span class="section-number-3">3.4</span> Win vs. difference in seeds</h3>
+<div class="outline-text-3" id="text-3-4">
+<div class="org-src-container">
+<pre class="src src-python">sns.lmplot(x=<span style="color: #8b2252;">'seeddiff'</span>, y=<span style="color: #8b2252;">'team1win'</span>, hue=<span style="color: #8b2252;">'tourney'</span>, data=data,
+           scatter_kws={<span style="color: #8b2252;">"s"</span>: 5}, y_jitter=0.03, logistic=<span style="color: #008b8b;">True</span>, aspect=1.5)
+show_fig(<span style="color: #8b2252;">'scatter_win_by_seeddiff.png'</span>)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="../figs/eda/eda_2015/scatter_win_by_seeddiff.png" alt="scatter_win_by_seeddiff.png" />
+</p>
+</div>
+
+<p>
+Similar result here as above, but for the logistic regression
+curve. The difference in seeds has less impact on the winning
+probabilities in the tournament than during regular season.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgc8e867b" class="outline-3">
+<h3 id="orgc8e867b"><span class="section-number-3">3.5</span> Distribution of winning vs. losing points</h3>
+<div class="outline-text-3" id="text-3-5">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">fig</span>, <span style="color: #a0522d;">axes</span> = plt.subplots(1, 2, sharex=<span style="color: #008b8b;">True</span>, sharey=<span style="color: #008b8b;">True</span>, figsize=(10, 6))
+axes[0].scatter(data[<span style="color: #8b2252;">'score_l'</span>], data[<span style="color: #8b2252;">'score_w'</span>], s=1)
+axes[1].hexbin(data[<span style="color: #8b2252;">'score_l'</span>], data[<span style="color: #8b2252;">'score_w'</span>], bins=<span style="color: #8b2252;">'log'</span>, gridsize=50)
+plt.subplots_adjust(left=0.1, bottom=0.2, right=<span style="color: #008b8b;">None</span>, top=<span style="color: #008b8b;">None</span>, wspace=0.05, hspace=<span style="color: #008b8b;">None</span>)
+plt.suptitle(<span style="color: #8b2252;">'Winning vs. Losing Scores'</span>)
+fig.text(0.5, 0.04, <span style="color: #8b2252;">'Losing Score'</span>, ha=<span style="color: #8b2252;">'center'</span>)
+fig.text(0.04, 0.5, <span style="color: #8b2252;">'Winning Score'</span>, va=<span style="color: #8b2252;">'center'</span>, rotation=<span style="color: #8b2252;">'vertical'</span>)
+show_fig(<span style="color: #8b2252;">'scatter_winscore_by_losescore.png'</span>)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="../figs/eda/eda_2015/scatter_winscore_by_losescore.png" alt="scatter_winscore_by_losescore.png" />
+</p>
+</div>
+
+<p>
+When the losing team scores high, the games are more competitive in a
+sense that there's less score difference. This is intuitive because
+there's a soft threshold for the total points scored in a game due to
+the play-clock.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgafab0bb" class="outline-3">
+<h3 id="orgafab0bb"><span class="section-number-3">3.6</span> Distribution of score difference by losing team's points</h3>
+<div class="outline-text-3" id="text-3-6">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">fig</span>, <span style="color: #a0522d;">axes</span> = plt.subplots(1, 2, sharex=<span style="color: #008b8b;">True</span>, sharey=<span style="color: #008b8b;">True</span>, figsize=(10, 6))
+axes[0].scatter(data[<span style="color: #8b2252;">'score_l'</span>], data[<span style="color: #8b2252;">'scorediff'</span>].<span style="color: #483d8b;">abs</span>(), s=1)
+axes[1].hexbin(data[<span style="color: #8b2252;">'score_l'</span>], data[<span style="color: #8b2252;">'scorediff'</span>].<span style="color: #483d8b;">abs</span>(), bins=<span style="color: #8b2252;">'log'</span>, gridsize=50)
+plt.subplots_adjust(left=0.1, bottom=0.2, right=<span style="color: #008b8b;">None</span>, top=<span style="color: #008b8b;">None</span>, wspace=0.05, hspace=<span style="color: #008b8b;">None</span>)
+plt.suptitle(<span style="color: #8b2252;">'Score Difference vs. Losing Score'</span>)
+fig.text(0.5, 0.04, <span style="color: #8b2252;">'Losing Team Points'</span>, ha=<span style="color: #8b2252;">'center'</span>)
+fig.text(0.04, 0.5, <span style="color: #8b2252;">'Score Difference'</span>, va=<span style="color: #8b2252;">'center'</span>, rotation=<span style="color: #8b2252;">'vertical'</span>)
+show_fig(<span style="color: #8b2252;">'scatter_scorediff_by_losingpoints.png'</span>)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="../figs/eda/eda_2015/scatter_scorediff_by_losingpoints.png" alt="scatter_scorediff_by_losingpoints.png" />
+</p>
+</div>
+
+<p>
+This plot shows the same information as the previous one.
+</p>
+</div>
+</div>
+</div>

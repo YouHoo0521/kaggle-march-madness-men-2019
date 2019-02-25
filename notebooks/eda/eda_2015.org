@@ -1,0 +1,243 @@
+#+OPTIONS: ^:nil toc:nil
+#+BEGIN_EXPORT html
+---
+layout: page
+title: EDA - Season 2015
+---
+#+END_EXPORT
+
+#+TOC: headlines 2
+
+#+BEGIN_EXPORT html
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      inlineMath: [['$','$']]
+    }
+  });
+</script>
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+#+END_EXPORT
+
+* Motivation
+Here we explore the data from 2015 season. 2015 was chosen arbitrarily
+among recent years. There's a few reasons for visualizing a single
+season at a time.
+
+- It keeps the code simple. We can later write functions to do the
+  same for the other seasons or multiple seasons combined.
+- It reflects my general modeling approach: Stay simple until there
+  are reasons not to.
+  
+  Our main goal is to predict the outcomes of the 2019
+  tournament. Regular season results from 2019 season might help us
+  with this prediction, but it's not clear what information can be
+  gained from previous seasons, given that the roster goes through a
+  significant change each season.  For instance, what can we actually
+  learn from the 2000 season that can help us predict the outcomes of
+  the 2019 tournament? Not that useful information can't be shared
+  across seasons, but we'll explore the incremental benefits of using
+  larger datasets and more complicated models.
+  
+  Focusing on a single season at a time helps us retain simplicity and
+  interpretability. The goal, of course, is to expand our models, and
+  we'll do that in a way that helps us gain insight about the problem
+  domain.
+
+* Setup
+** Load Packages
+#+begin_src python :session
+  import pandas as pd
+  import numpy as np
+  from matplotlib import pyplot as plt
+  import seaborn as sns
+  from tabulate import tabulate
+  from src import utils  # see src/ folder in project repo
+  from src.data import make_dataset
+#+end_src
+
+#+RESULTS:
+
+** Helper Functions
+#+begin_src python :session
+  print_df = utils.create_print_df_fcn(tablefmt='html');
+  show_fig = utils.create_show_fig_fcn(img_dir='eda/eda_2015/');
+#+end_src
+
+#+RESULTS:
+
+** Load Data
+#+begin_src python :session :exports both :results output html :eval never-export
+  data = make_dataset.get_train_data_v1(season=2015)
+  # difference in scores
+  data['scorediff'] = data['score1'] - data['score2']
+  # winning and losing scores
+  data['score_w'] = np.where(data.team1win == 1, data.score1, data.score2)
+  data['score_l'] = np.where(data.team1win == 0, data.score1, data.score2)
+  print('Data size = {}'.format(data.shape))
+  print_df(data.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+Data size = (5421, 19)
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  season</th><th style="text-align: right;">  daynum</th><th style="text-align: right;">  numot</th><th style="text-align: right;">  tourney</th><th style="text-align: right;">  team1</th><th style="text-align: right;">  team2</th><th style="text-align: right;">  score1</th><th style="text-align: right;">  score2</th><th style="text-align: right;">  loc</th><th style="text-align: right;">  team1win</th><th>seed1  </th><th style="text-align: right;">  seednum1</th><th style="text-align: right;">  seed2</th><th style="text-align: right;">  seednum2</th><th style="text-align: right;">  seeddiff</th><th style="text-align: right;">            ID</th><th style="text-align: right;">  scorediff</th><th style="text-align: right;">  score_w</th><th style="text-align: right;">  score_l</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1103</td><td style="text-align: right;">   1420</td><td style="text-align: right;">      74</td><td style="text-align: right;">      57</td><td style="text-align: right;"> 1103</td><td style="text-align: right;">         1</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1103_1420</td><td style="text-align: right;">         17</td><td style="text-align: right;">       74</td><td style="text-align: right;">       57</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1104</td><td style="text-align: right;">   1406</td><td style="text-align: right;">      82</td><td style="text-align: right;">      54</td><td style="text-align: right;"> 1104</td><td style="text-align: right;">         1</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1104_1406</td><td style="text-align: right;">         28</td><td style="text-align: right;">       82</td><td style="text-align: right;">       54</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1112</td><td style="text-align: right;">   1291</td><td style="text-align: right;">      78</td><td style="text-align: right;">      55</td><td style="text-align: right;"> 1112</td><td style="text-align: right;">         1</td><td>Z02    </td><td style="text-align: right;">         2</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1112_1291</td><td style="text-align: right;">         23</td><td style="text-align: right;">       78</td><td style="text-align: right;">       55</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1113</td><td style="text-align: right;">   1152</td><td style="text-align: right;">      86</td><td style="text-align: right;">      50</td><td style="text-align: right;"> 1113</td><td style="text-align: right;">         1</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1113_1152</td><td style="text-align: right;">         36</td><td style="text-align: right;">       86</td><td style="text-align: right;">       50</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1102</td><td style="text-align: right;">   1119</td><td style="text-align: right;">      78</td><td style="text-align: right;">      84</td><td style="text-align: right;"> 1119</td><td style="text-align: right;">         0</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1102_1119</td><td style="text-align: right;">         -6</td><td style="text-align: right;">       84</td><td style="text-align: right;">       78</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+** Basic Description
+#+begin_src python :session :exports both :results output html :eval never-export
+  n_missing = data.isna().sum().rename('n_missing')
+  print_df(data.describe().append(n_missing))
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+<table>
+<thead>
+<tr><th>         </th><th style="text-align: right;">  season</th><th style="text-align: right;">   daynum</th><th style="text-align: right;">       numot</th><th style="text-align: right;">     tourney</th><th style="text-align: right;">    team1</th><th style="text-align: right;">    team2</th><th style="text-align: right;">   score1</th><th style="text-align: right;">   score2</th><th style="text-align: right;">   team1win</th><th style="text-align: right;">  seednum1</th><th style="text-align: right;">  seednum2</th><th style="text-align: right;">   seeddiff</th><th style="text-align: right;">  scorediff</th><th style="text-align: right;">  score_w</th><th style="text-align: right;">  score_l</th><th style="text-align: right;">  ID</th><th style="text-align: right;">  loc</th><th style="text-align: right;">  seed1</th><th style="text-align: right;">  seed2</th></tr>
+</thead>
+<tbody>
+<tr><td>count    </td><td style="text-align: right;">    5421</td><td style="text-align: right;">5421     </td><td style="text-align: right;">5421        </td><td style="text-align: right;">5421        </td><td style="text-align: right;">5421     </td><td style="text-align: right;">5421     </td><td style="text-align: right;">5421     </td><td style="text-align: right;">5421     </td><td style="text-align: right;">5421       </td><td style="text-align: right;">1166      </td><td style="text-align: right;">1161      </td><td style="text-align: right;"> 376       </td><td style="text-align: right;">5421       </td><td style="text-align: right;">5421     </td><td style="text-align: right;">5421     </td><td style="text-align: right;"> nan</td><td style="text-align: right;">  nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">    nan</td></tr>
+<tr><td>mean     </td><td style="text-align: right;">    2015</td><td style="text-align: right;">  71.5853</td><td style="text-align: right;">   0.0791367</td><td style="text-align: right;">   0.0123593</td><td style="text-align: right;">1224.32  </td><td style="text-align: right;">1343.95  </td><td style="text-align: right;">  66.3785</td><td style="text-align: right;">  67.3331</td><td style="text-align: right;">   0.472607</td><td style="text-align: right;">   8.57719</td><td style="text-align: right;">   8.62532</td><td style="text-align: right;">   0.361702</td><td style="text-align: right;">  -0.954621</td><td style="text-align: right;">  72.6838</td><td style="text-align: right;">  61.0279</td><td style="text-align: right;"> nan</td><td style="text-align: right;">  nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">    nan</td></tr>
+<tr><td>std      </td><td style="text-align: right;">       0</td><td style="text-align: right;">  36.0027</td><td style="text-align: right;">   0.326858 </td><td style="text-align: right;">   0.110494 </td><td style="text-align: right;">  85.1581</td><td style="text-align: right;">  84.8386</td><td style="text-align: right;">  12.0862</td><td style="text-align: right;">  11.9573</td><td style="text-align: right;">   0.499295</td><td style="text-align: right;">   4.77696</td><td style="text-align: right;">   4.60865</td><td style="text-align: right;">   5.70773 </td><td style="text-align: right;">  14.6983  </td><td style="text-align: right;">  10.541 </td><td style="text-align: right;">  10.5097</td><td style="text-align: right;"> nan</td><td style="text-align: right;">  nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">    nan</td></tr>
+<tr><td>min      </td><td style="text-align: right;">    2015</td><td style="text-align: right;">  11     </td><td style="text-align: right;">   0        </td><td style="text-align: right;">   0        </td><td style="text-align: right;">1101     </td><td style="text-align: right;">1106     </td><td style="text-align: right;">  26     </td><td style="text-align: right;">  26     </td><td style="text-align: right;">   0       </td><td style="text-align: right;">   1      </td><td style="text-align: right;">   1      </td><td style="text-align: right;"> -15       </td><td style="text-align: right;"> -62       </td><td style="text-align: right;">  38     </td><td style="text-align: right;">  26     </td><td style="text-align: right;"> nan</td><td style="text-align: right;">  nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">    nan</td></tr>
+<tr><td>25%      </td><td style="text-align: right;">    2015</td><td style="text-align: right;">  40     </td><td style="text-align: right;">   0        </td><td style="text-align: right;">   0        </td><td style="text-align: right;">1154     </td><td style="text-align: right;">1285     </td><td style="text-align: right;">  58     </td><td style="text-align: right;">  59     </td><td style="text-align: right;">   0       </td><td style="text-align: right;">   4      </td><td style="text-align: right;">   5      </td><td style="text-align: right;">  -3       </td><td style="text-align: right;"> -10       </td><td style="text-align: right;">  65     </td><td style="text-align: right;">  54     </td><td style="text-align: right;"> nan</td><td style="text-align: right;">  nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">    nan</td></tr>
+<tr><td>50%      </td><td style="text-align: right;">    2015</td><td style="text-align: right;">  74     </td><td style="text-align: right;">   0        </td><td style="text-align: right;">   0        </td><td style="text-align: right;">1210     </td><td style="text-align: right;">1359     </td><td style="text-align: right;">  66     </td><td style="text-align: right;">  67     </td><td style="text-align: right;">   0       </td><td style="text-align: right;">   9      </td><td style="text-align: right;">   9      </td><td style="text-align: right;">   0       </td><td style="text-align: right;">  -2       </td><td style="text-align: right;">  72     </td><td style="text-align: right;">  61     </td><td style="text-align: right;"> nan</td><td style="text-align: right;">  nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">    nan</td></tr>
+<tr><td>75%      </td><td style="text-align: right;">    2015</td><td style="text-align: right;"> 103     </td><td style="text-align: right;">   0        </td><td style="text-align: right;">   0        </td><td style="text-align: right;">1281     </td><td style="text-align: right;">1414     </td><td style="text-align: right;">  74     </td><td style="text-align: right;">  75     </td><td style="text-align: right;">   1       </td><td style="text-align: right;">  13      </td><td style="text-align: right;">  12      </td><td style="text-align: right;">   4       </td><td style="text-align: right;">   9       </td><td style="text-align: right;">  79     </td><td style="text-align: right;">  68     </td><td style="text-align: right;"> nan</td><td style="text-align: right;">  nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">    nan</td></tr>
+<tr><td>max      </td><td style="text-align: right;">    2015</td><td style="text-align: right;"> 154     </td><td style="text-align: right;">   4        </td><td style="text-align: right;">   1        </td><td style="text-align: right;">1460     </td><td style="text-align: right;">1464     </td><td style="text-align: right;"> 116     </td><td style="text-align: right;"> 126     </td><td style="text-align: right;">   1       </td><td style="text-align: right;">  16      </td><td style="text-align: right;">  16      </td><td style="text-align: right;">  15       </td><td style="text-align: right;">  69       </td><td style="text-align: right;"> 126     </td><td style="text-align: right;"> 111     </td><td style="text-align: right;"> nan</td><td style="text-align: right;">  nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">    nan</td></tr>
+<tr><td>n_missing</td><td style="text-align: right;">       0</td><td style="text-align: right;">   0     </td><td style="text-align: right;">   0        </td><td style="text-align: right;">   0        </td><td style="text-align: right;">   0     </td><td style="text-align: right;">   0     </td><td style="text-align: right;">   0     </td><td style="text-align: right;">   0     </td><td style="text-align: right;">   0       </td><td style="text-align: right;">4255      </td><td style="text-align: right;">4260      </td><td style="text-align: right;">5045       </td><td style="text-align: right;">   0       </td><td style="text-align: right;">   0     </td><td style="text-align: right;">   0     </td><td style="text-align: right;">   0</td><td style="text-align: right;">    0</td><td style="text-align: right;">   4255</td><td style="text-align: right;">   4260</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+* Visualizations
+** Distribution of points from each team
+#+begin_src python :session :exports both :results output file :eval never-export
+  fig, axes = plt.subplots(2, 2, figsize=(8, 8), sharex=True, sharey=True)
+  for i, (is_tourney, df) in enumerate(data.groupby('tourney')):
+      color = '#1f77b4' if is_tourney == 0 else '#ff7f0e'
+      axes[i,0].scatter(df.score1, df.score2, s=1, c=color)
+      axes[i,1].hexbin(df.score1, df.score2, bins='log', gridsize=50)
+      lims = [20, 125]
+      axes[i,0].set_ylabel('Team 2 Score ({})'.format('Regular' if is_tourney == 0 else 'Tourney'))
+      axes[i,1].set_xlim(lims)
+      axes[i,1].set_ylim(lims)
+      for j in range(2):
+	axes[i,j].plot(lims, lims, c='r', lw=0.5)
+  axes[1,0].set_xlabel('Team 1 Score')
+  axes[1,1].set_xlabel('Team 1 Score')
+  plt.subplots_adjust(left=None, bottom=None, right=None, top=None, wspace=0.05, hspace=0.05)
+  plt.suptitle('Bivariate Distribution of Points')
+  show_fig('scatter_points.png')
+#+end_src
+
+#+RESULTS:
+[[file:../figs/eda/eda_2015/scatter_points.png]]
+
+An initial look at the distribution of points scored by team 1 (with
+lower ID) and team 2 (with higher ID). As expected, there's nothing
+special here which means that team IDs are probably assigned
+arbitrarily.
+
+** Proportion of win by difference in seeds
+#+begin_src python :session :exports both :results output file :eval never-export
+  df_tmp = data.groupby(['tourney', 'seeddiff'])['team1win'].agg(['sum', 'size']).reset_index()
+  fig, axes = plt.subplots(2, 1, figsize = (7, 10), sharex=True)
+  for i, (is_tourney, df) in enumerate(df_tmp.groupby('tourney')):
+      axes[i].bar(df.seeddiff, df['size'], label='Loss')
+      axes[i].bar(df.seeddiff, df['sum'], label='Win')
+      axes[i].set_title('Regular' if is_tourney == 0 else 'Tourney')
+  axes[1].set_xlabel('Difference in Seeds')
+  handles, labels = axes[0].get_legend_handles_labels()
+  fig.legend(handles, labels, loc='right')
+  show_fig('bar_win_by_seeddiff.png')
+#+end_src
+
+#+RESULTS:
+[[file:../figs/eda/eda_2015/bar_win_by_seeddiff.png]]
+
+This figure shows the result of the games between seeded teams. Win,
+loss, and difference in seeds are from the perspective of team 1, or
+the team with the lower ID. For example, there were 3 tournament games
+in which team 1 was the underdog by 15 seed points, and all resulted
+in a loss. There were also two upsets in the tournament in which teams
+who had 11 seed point advantage lost the game.
+
+** Difference in scores by difference in seeds
+#+begin_src python :session :exports both :results output file :eval never-export
+  sns.lmplot(x='seeddiff', y='scorediff', hue='tourney', data=data, aspect=1.5)
+  show_fig('scatter_scorediff_by_seeddiff.png')
+#+end_src
+
+#+RESULTS:
+[[file:../figs/eda/eda_2015/scatter_scorediff_by_seeddiff.png]]
+
+There isn't a huge difference, but the slope between =scorediff= and
+=seeddiff= is less steep for the tournament games. This means that the
+games tend to be closer in the tournament than regular season,
+controlling for the difference in seeds. The difference in slopes
+might be used to quantify the increase in competitiveness in the
+tournament.
+
+** Win vs. difference in seeds
+#+begin_src python :session :exports both :results output file :eval never-export
+  sns.lmplot(x='seeddiff', y='team1win', hue='tourney', data=data,
+	     scatter_kws={"s": 5}, y_jitter=0.03, logistic=True, aspect=1.5)
+  show_fig('scatter_win_by_seeddiff.png')
+#+end_src
+
+#+RESULTS:
+[[file:../figs/eda/eda_2015/scatter_win_by_seeddiff.png]]
+
+Similar result here as above, but for the logistic regression
+curve. The difference in seeds has less impact on the winning
+probabilities in the tournament than during regular season.
+
+** Distribution of winning vs. losing points
+#+begin_src python :session :exports both :results output file :eval never-export
+  fig, axes = plt.subplots(1, 2, sharex=True, sharey=True, figsize=(10, 6))
+  axes[0].scatter(data['score_l'], data['score_w'], s=1)
+  axes[1].hexbin(data['score_l'], data['score_w'], bins='log', gridsize=50)
+  plt.subplots_adjust(left=0.1, bottom=0.2, right=None, top=None, wspace=0.05, hspace=None)
+  plt.suptitle('Winning vs. Losing Scores')
+  fig.text(0.5, 0.04, 'Losing Score', ha='center')
+  fig.text(0.04, 0.5, 'Winning Score', va='center', rotation='vertical')
+  show_fig('scatter_winscore_by_losescore.png')
+#+end_src
+
+#+RESULTS:
+[[file:../figs/eda/eda_2015/scatter_winscore_by_losescore.png]]
+
+When the losing team scores high, the games are more competitive in a
+sense that there's less score difference. This is intuitive because
+there's a soft threshold for the total points scored in a game due to
+the play-clock.
+
+** Distribution of score difference by losing team's points
+#+begin_src python :session :exports both :results output file :eval never-export
+  fig, axes = plt.subplots(1, 2, sharex=True, sharey=True, figsize=(10, 6))
+  axes[0].scatter(data['score_l'], data['scorediff'].abs(), s=1)
+  axes[1].hexbin(data['score_l'], data['scorediff'].abs(), bins='log', gridsize=50)
+  plt.subplots_adjust(left=0.1, bottom=0.2, right=None, top=None, wspace=0.05, hspace=None)
+  plt.suptitle('Score Difference vs. Losing Score')
+  fig.text(0.5, 0.04, 'Losing Team Points', ha='center')
+  fig.text(0.04, 0.5, 'Score Difference', va='center', rotation='vertical')
+  show_fig('scatter_scorediff_by_losingpoints.png')
+#+end_src
+
+#+RESULTS:
+[[file:../figs/eda/eda_2015/scatter_scorediff_by_losingpoints.png]]
+
+This plot shows the same information as the previous one.

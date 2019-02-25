@@ -8,3 +8,4 @@ title: EDA
 
 #+TOC: headlines 3
 
+- [[./eda/eda_2015.org][Explore 2015 Season]]
