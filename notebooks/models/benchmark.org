@@ -43,7 +43,6 @@ Quick Summary:
 #+end_src
 
 #+RESULTS:
-| 2 | 1 | 0.86666667 | 0.8 | 0.76666667 | 0.73333333 | 0.66666667 | 0.63333333 | 0.6 | 0.56666667 | 0.53333333 | 0.5 | 0.46666667 | 0.43333333 | 0.4 | 0.36666667 | 0.33333333 | 0.3 | 0.26666667 | 0.23333333 | 0.2 | 0.06666667 | 0 |
 
 ** Helper Functions
 #+begin_src python :session
@@ -52,7 +51,6 @@ Quick Summary:
 #+end_src
 
 #+RESULTS:
-| 2 | 1 | 0.86666667 | 0.8 | 0.76666667 | 0.73333333 | 0.66666667 | 0.63333333 | 0.6 | 0.56666667 | 0.53333333 | 0.5 | 0.46666667 | 0.43333333 | 0.4 | 0.36666667 | 0.33333333 | 0.3 | 0.26666667 | 0.23333333 | 0.2 | 0.06666667 | 0 |
 
 ** Load Data
 #+begin_src python :session :exports both :results output html :eval never-export
@@ -125,8 +123,10 @@ $$p(win_i) = \frac{d_i - d_{min}}{d_{max} - d_{min}}$$
 		.groupby('season')
 		.apply(lambda x: log_loss(x['team1win'], x['Pred'])))
       models_loss[m_name] = m_loss
+  log_loss_df = pd.DataFrame(models_loss)
+  log_loss_df.to_csv('./log_loss_benchmark.csv')
   fig, ax = plt.subplots()
-  pd.DataFrame(models_loss).plot(ax=ax)
+  log_loss_df.plot(ax=ax)
   ax.set_title('Log Loss - Benchmark Models')
   ax.set_ylabel('Log Loss')
   show_fig('log_loss.png')
