@@ -185,8 +185,10 @@ In math, this is
               .groupby(<span style="color: #8b2252;">'season'</span>)
               .<span style="color: #483d8b;">apply</span>(<span style="color: #a020f0;">lambda</span> x: log_loss(x[<span style="color: #8b2252;">'team1win'</span>], x[<span style="color: #8b2252;">'Pred'</span>])))
 <span style="background-color: #f2f2f2;"> </span>   <span style="color: #a0522d;">models_loss</span>[m_name] = m_loss
+<span style="color: #a0522d;">log_loss_df</span> = pd.DataFrame(models_loss)
+log_loss_df.to_csv(<span style="color: #8b2252;">'./log_loss_benchmark.csv'</span>)
 <span style="color: #a0522d;">fig</span>, <span style="color: #a0522d;">ax</span> = plt.subplots()
-pd.DataFrame(models_loss).plot(ax=ax)
+log_loss_df.plot(ax=ax)
 ax.set_title(<span style="color: #8b2252;">'Log Loss - Benchmark Models'</span>)
 ax.set_ylabel(<span style="color: #8b2252;">'Log Loss'</span>)
 show_fig(<span style="color: #8b2252;">'log_loss.png'</span>)
