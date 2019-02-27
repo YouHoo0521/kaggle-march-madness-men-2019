@@ -7,3 +7,4 @@ title: Models
 #+END_EXPORT
 
 - [[./models/benchmark.org][Benchmark Models]]
+- [[./models/bradley_terry.org][Bradley-Terry Model]]
