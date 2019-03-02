@@ -28,7 +28,7 @@ TLDR:
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
 <ul>
-<li><a href="#org0d8def2">1. Model</a>
+<li><a href="#orgd414933">1. Model</a>
 <ul>
 <li><a href="#org761a340">1.1. Full Bayesian Model Statement</a></li>
 </ul>
@@ -57,8 +57,8 @@ TLDR:
 </div>
 </div>
 
-<div id="outline-container-org0d8def2" class="outline-2">
-<h2 id="org0d8def2"><span class="section-number-2">1</span> Model</h2>
+<div id="outline-container-orgd414933" class="outline-2">
+<h2 id="orgd414933"><span class="section-number-2">1</span> Model</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 <a href="./research.html#orgecc7140">Bradley-Terry Model</a> assumes that the probability of winning, denoted
@@ -254,7 +254,7 @@ from each scenario to perform inference and prediction.
 <h4 id="org78b6a78"><span class="section-number-4">2.1.2</span> Helper Functions</h4>
 <div class="outline-text-4" id="text-2-1-2">
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #a0522d;">print_df</span> = utils.create_print_df_fcn(tablefmt=<span style="color: #8b2252;">'orgtbl'</span>);
+<pre class="src src-python"><span style="color: #a0522d;">print_df</span> = utils.create_print_df_fcn(tablefmt=<span style="color: #8b2252;">'html'</span>);
 <span style="color: #a0522d;">show_fig</span> = utils.create_show_fig_fcn(img_dir=<span style="color: #8b2252;">'models/bradley_terry/'</span>);
 </pre>
 </div>
@@ -270,16 +270,18 @@ print_df(data.head())
 </pre>
 </div>
 
-<pre class="example">
-|    |   season |   daynum |   numot |   tourney |   team1 |   team2 |   score1 |   score2 |   loc |   team1win | seed1   |   seednum1 |   seed2 |   seednum2 |   seeddiff |             ID |
-|----+----------+----------+---------+-----------+---------+---------+----------+----------+-------+------------+---------+------------+---------+------------+------------+----------------|
-|  0 |     2015 |       11 |       0 |         0 |    1103 |    1420 |       74 |       57 |  1103 |          1 | nan     |        nan |     nan |        nan |        nan | 2015_1103_1420 |
-|  1 |     2015 |       11 |       0 |         0 |    1104 |    1406 |       82 |       54 |  1104 |          1 | nan     |        nan |     nan |        nan |        nan | 2015_1104_1406 |
-|  2 |     2015 |       11 |       0 |         0 |    1112 |    1291 |       78 |       55 |  1112 |          1 | Z02     |          2 |     nan |        nan |        nan | 2015_1112_1291 |
-|  3 |     2015 |       11 |       0 |         0 |    1113 |    1152 |       86 |       50 |  1113 |          1 | nan     |        nan |     nan |        nan |        nan | 2015_1113_1152 |
-|  4 |     2015 |       11 |       0 |         0 |    1102 |    1119 |       78 |       84 |  1119 |          0 | nan     |        nan |     nan |        nan |        nan | 2015_1102_1119 |
-
-</pre>
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  season</th><th style="text-align: right;">  daynum</th><th style="text-align: right;">  numot</th><th style="text-align: right;">  tourney</th><th style="text-align: right;">  team1</th><th style="text-align: right;">  team2</th><th style="text-align: right;">  score1</th><th style="text-align: right;">  score2</th><th style="text-align: right;">  loc</th><th style="text-align: right;">  team1win</th><th>seed1  </th><th style="text-align: right;">  seednum1</th><th style="text-align: right;">  seed2</th><th style="text-align: right;">  seednum2</th><th style="text-align: right;">  seeddiff</th><th style="text-align: right;">            ID</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1103</td><td style="text-align: right;">   1420</td><td style="text-align: right;">      74</td><td style="text-align: right;">      57</td><td style="text-align: right;"> 1103</td><td style="text-align: right;">         1</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1103_1420</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1104</td><td style="text-align: right;">   1406</td><td style="text-align: right;">      82</td><td style="text-align: right;">      54</td><td style="text-align: right;"> 1104</td><td style="text-align: right;">         1</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1104_1406</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1112</td><td style="text-align: right;">   1291</td><td style="text-align: right;">      78</td><td style="text-align: right;">      55</td><td style="text-align: right;"> 1112</td><td style="text-align: right;">         1</td><td>Z02    </td><td style="text-align: right;">         2</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1112_1291</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1113</td><td style="text-align: right;">   1152</td><td style="text-align: right;">      86</td><td style="text-align: right;">      50</td><td style="text-align: right;"> 1113</td><td style="text-align: right;">         1</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1113_1152</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1102</td><td style="text-align: right;">   1119</td><td style="text-align: right;">      78</td><td style="text-align: right;">      84</td><td style="text-align: right;"> 1119</td><td style="text-align: right;">         0</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1102_1119</td></tr>
+</tbody>
+</table>
 </div>
 </div>
 
@@ -300,8 +302,8 @@ print_df(data.head())
 <h3 id="orgb0735ef"><span class="section-number-3">2.2</span> Stan</h3>
 <div class="outline-text-3" id="text-2-2">
 </div>
-<div id="outline-container-org8b737ea" class="outline-4">
-<h4 id="org8b737ea"><span class="section-number-4">2.2.1</span> Model</h4>
+<div id="outline-container-orge46e7cc" class="outline-4">
+<h4 id="orge46e7cc"><span class="section-number-4">2.2.1</span> Model</h4>
 <div class="outline-text-4" id="text-2-2-1">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #a0522d;">model_code</span> = <span style="color: #8b2252;">'''</span>
