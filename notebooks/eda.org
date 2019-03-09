@@ -6,6 +6,5 @@ title: EDA
 ---
 #+END_EXPORT
 
-#+TOC: headlines 3
-
+* Exploratory Analysis and Visualizataion
 - [[./eda/eda_2015.org][Explore 2015 Season]]

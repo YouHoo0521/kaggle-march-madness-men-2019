@@ -1,10 +1,12 @@
-#+OPTIONS: ^:nil toc:nil
+#+OPTIONS: ^:nil toc:nil num:nil
 #+BEGIN_EXPORT html
 ---
 layout: default
 title: Models
 ---
 #+END_EXPORT
+
+* Models
 
 - [[./models/benchmark.org][Benchmark Models]]
 - [[./models/bradley_terry.org][Bradley-Terry Model]]

@@ -1,0 +1,118 @@
+#+OPTIONS: ^:nil toc:nil
+#+BEGIN_EXPORT html
+---
+layout: page
+title: Contributing
+---
+
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+#+END_EXPORT
+
+This page documents how to download/setup the project and contribute
+to the [[https://github.com/YouHoo0521/kaggle-march-madness-men-2019][project Github]]. 
+
+#+TOC: headlines 2
+
+* Setup
+** Clone the Github repo locally
+1. Copy the project into a local directory called =kaggle-march-madness-men-2019/=.
+   #+begin_example
+   git clone https://github.com/YouHoo0521/kaggle-march-madness-men-2019.git
+   #+end_example
+
+2. Move into the directory.
+   #+begin_example
+   cd kaggle-march-madness-men-2019
+   #+end_example
+
+** Set up virtual environment
+1. Create a new virtual environment called =march-madness=. Do this once.
+   #+begin_example
+   virtualenv venv/march-madness --python=python3.6
+   #+end_example
+
+2. Activate the virtual environment. Do this before every session.
+   #+begin_example
+   source venv/march-madness/bin/activate
+   #+end_example
+   
+3. Install required Python packages into the virtual environment. Do
+   this every time =requirements.txt= file changes.
+   #+begin_example
+   pip3 install -r requirements.txt
+   #+end_example
+   - Update =requirements.txt= if the source code requires new packages.
+
+** Install the project package
+This project is organized as a Python package. We can write the source
+code in =src/= directory and import it from elsewhere, such as in
+=notebook/=.
+
+We can install the package (into our virtual environment) in
+development mode so that the changes we make to the source can be used
+immediately.
+#+begin_example
+python setup.py develop
+#+end_example
+
+At this point, we can import our package from anywhere by calling:
+#+begin_src python :eval no
+import src                                           # import entire package
+from src.data import make_dataset                    # import a module
+from src.data.make_dataset import get_train_data_v1  # import a function
+#+end_src
+
+
+* Develop
+By default, =git= will point to =master= branch, which is the
+production version. We want to develop in a separate branch and merge
+the changes back to master.
+
+1. Confirm that you're in local =master= branch.
+   #+begin_example
+   git status
+   #+end_example
+   The first line should say =On branch master=. If not, run
+   #+begin_example
+   git checkout master
+   #+end_example
+2. Pull the latest updates from =origin/master= branch. =origin=
+   refers to the remote repo on Github, which is the official version
+   of our code.
+   #+begin_example
+   git pull origin master
+   #+end_example
+3. Create and checkout a new branch off of =master=. The following
+   command is a shortcut for creating a new branch called
+   =dev_logistic_regression= and moving into it.
+   #+begin_example
+   git checkout -b dev_logistic_regression
+   #+end_example
+4. Write code.
+   - Put reusable code in =src/= directory
+   - Put exploratory analysis in =notebooks/= directory
+   - Put scripts in =bin/= directory
+     - e.g command line scripts for ML pipeline (data prep, training, cross-validation, evaluation)
+5. Stage changed files for commit.
+   #+begin_example
+   git add new_file_name
+   git add modified_file_name
+   git add deleted_file_name
+   #+end_example
+5. Commit changes locally.
+   #+begin_example
+   git commit -m "Write message here."
+   #+end_example
+
+* Push Changes
+When your code is ready to be checked in (after one or more local
+commits), you can push your local branch onto Github repo and submit a
+pull-request.
+1. Push your local branch (e.g. =dev_logistic_regression=) to
+   Github. This will create =origin/dev_logistic_regression= branch.
+   #+begin_example
+   git push origin dev_logistic_regression
+   #+end_example
+
+2. Go to [[https://github.com/YouHoo0521/kaggle-march-madness-men-2019][project Github]], navigate to your new branch, and click =new
+   pull request=.

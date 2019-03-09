@@ -1,0 +1,13 @@
+#+OPTIONS: ^:nil toc:nil num:nil
+#+BEGIN_EXPORT html
+---
+layout: default
+title: Doc
+---
+#+END_EXPORT
+
+* Documentation
+
+- [[./doc/contributing.org][Contributing to this project on Github]]
+
+- [[./doc/publish_org_jekyll.org][Using Org to publish html into Jekyll site]]

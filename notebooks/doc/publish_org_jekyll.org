@@ -2,11 +2,12 @@
 #+BEGIN_EXPORT html
 ---
 layout: default
-title: Misc
+title: Org Publish and Jekyll
 ---
 #+END_EXPORT
 
-This page contains random off-topic notes for my own sanity.
+I use Emacs Org mode for this project (and everything else). Here's
+how I set up my (org-babel) notebooks to publish into a Jekyll site.
 
 #+TOC: headlines 2
 
