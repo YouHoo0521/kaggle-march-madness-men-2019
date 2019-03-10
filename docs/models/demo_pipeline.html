@@ -1,0 +1,270 @@
+---
+layout: page
+title: Logistic Regression Pipeline Example
+---
+
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
+<p>
+This page is an example of a minimal pipeline for a logistic
+regression classifier for the 2015 season.
+</p>
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#orgb379367">1. Setup</a>
+<ul>
+<li><a href="#orge313292">1.1. Load Packages</a></li>
+<li><a href="#orga3f4b51">1.2. Helper Functions</a></li>
+<li><a href="#orgcac6998">1.3. Load Data</a></li>
+<li><a href="#orgbd013fe">1.4. Process Data</a></li>
+</ul>
+</li>
+<li><a href="#orgb4820bf">2. Models</a>
+<ul>
+<li><a href="#org442539e">2.1. Simple Logistic Regression</a></li>
+</ul>
+</li>
+<li><a href="#org764eafa">3. Evaluation</a>
+<ul>
+<li><a href="#orgf2a8ff4">3.1. LogLoss</a></li>
+<li><a href="#orgd3a13d8">3.2. Accuracy</a></li>
+</ul>
+</li>
+<li><a href="#orgcc45f5c">4. Next Steps</a>
+<ul>
+<li><a href="#org75ec8a7">4.1. Data</a></li>
+<li><a href="#orgaec4a77">4.2. Models</a></li>
+<li><a href="#org1f3fa63">4.3. Evaluation</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgb379367" class="outline-2">
+<h2 id="orgb379367"><span class="section-number-2">1</span> Setup</h2>
+<div class="outline-text-2" id="text-1">
+</div>
+<div id="outline-container-orge313292" class="outline-3">
+<h3 id="orge313292"><span class="section-number-3">1.1</span> Load Packages</h3>
+<div class="outline-text-3" id="text-1-1">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a020f0;">import</span> pandas <span style="color: #a020f0;">as</span> pd
+<span style="color: #a020f0;">import</span> numpy <span style="color: #a020f0;">as</span> np
+<span style="color: #a020f0;">from</span> sklearn.metrics <span style="color: #a020f0;">import</span> log_loss
+<span style="color: #a020f0;">from</span> sklearn.linear_model <span style="color: #a020f0;">import</span> LogisticRegression
+<span style="color: #a020f0;">from</span> src <span style="color: #a020f0;">import</span> utils  <span style="color: #b22222;"># </span><span style="color: #b22222;">see src/ folder in project repo</span>
+<span style="color: #a020f0;">from</span> src.data <span style="color: #a020f0;">import</span> make_dataset
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orga3f4b51" class="outline-3">
+<h3 id="orga3f4b51"><span class="section-number-3">1.2</span> Helper Functions</h3>
+<div class="outline-text-3" id="text-1-2">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">print_df</span> = utils.create_print_df_fcn(tablefmt=<span style="color: #8b2252;">'html'</span>);
+<span style="color: #a0522d;">show_fig</span> = utils.create_show_fig_fcn(img_dir=<span style="color: #8b2252;">'models/classifier_pipeline_example/'</span>);
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgcac6998" class="outline-3">
+<h3 id="orgcac6998"><span class="section-number-3">1.3</span> Load Data</h3>
+<div class="outline-text-3" id="text-1-3">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">data</span> = make_dataset.get_train_data_v1(2015)
+print_df(data.head())
+</pre>
+</div>
+
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  season</th><th style="text-align: right;">  daynum</th><th style="text-align: right;">  numot</th><th style="text-align: right;">  tourney</th><th style="text-align: right;">  team1</th><th style="text-align: right;">  team2</th><th style="text-align: right;">  score1</th><th style="text-align: right;">  score2</th><th style="text-align: right;">  loc</th><th style="text-align: right;">  team1win</th><th>seed1  </th><th style="text-align: right;">  seednum1</th><th style="text-align: right;">  seed2</th><th style="text-align: right;">  seednum2</th><th style="text-align: right;">  seeddiff</th><th style="text-align: right;">            ID</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1103</td><td style="text-align: right;">   1420</td><td style="text-align: right;">      74</td><td style="text-align: right;">      57</td><td style="text-align: right;"> 1103</td><td style="text-align: right;">         1</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1103_1420</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1104</td><td style="text-align: right;">   1406</td><td style="text-align: right;">      82</td><td style="text-align: right;">      54</td><td style="text-align: right;"> 1104</td><td style="text-align: right;">         1</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1104_1406</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1112</td><td style="text-align: right;">   1291</td><td style="text-align: right;">      78</td><td style="text-align: right;">      55</td><td style="text-align: right;"> 1112</td><td style="text-align: right;">         1</td><td>Z02    </td><td style="text-align: right;">         2</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1112_1291</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1113</td><td style="text-align: right;">   1152</td><td style="text-align: right;">      86</td><td style="text-align: right;">      50</td><td style="text-align: right;"> 1113</td><td style="text-align: right;">         1</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1113_1152</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1102</td><td style="text-align: right;">   1119</td><td style="text-align: right;">      78</td><td style="text-align: right;">      84</td><td style="text-align: right;"> 1119</td><td style="text-align: right;">         0</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1102_1119</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div id="outline-container-orgbd013fe" class="outline-3">
+<h3 id="orgbd013fe"><span class="section-number-3">1.4</span> Process Data</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+We'll process the data for a logistic regression on a single feature,
+<code>seeddiff</code>, which is the difference in seeds.
+</p>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">X_train</span> = data.loc[data.tourney == 0, [<span style="color: #8b2252;">'seeddiff'</span>]].dropna()
+<span style="color: #a0522d;">X_test</span> = data.loc[data.tourney == 1, [<span style="color: #8b2252;">'seeddiff'</span>]].dropna()
+<span style="color: #a0522d;">y_train</span> = data.loc[X_train.index, <span style="color: #8b2252;">'team1win'</span>]
+<span style="color: #a0522d;">y_test</span> = data.loc[X_test.index, <span style="color: #8b2252;">'team1win'</span>]
+print_df(X_train.head())
+</pre>
+</div>
+
+<table>
+<thead>
+<tr><th style="text-align: right;">   </th><th style="text-align: right;">  seeddiff</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 26</td><td style="text-align: right;">         2</td></tr>
+<tr><td style="text-align: right;"> 42</td><td style="text-align: right;">        -9</td></tr>
+<tr><td style="text-align: right;"> 47</td><td style="text-align: right;">         0</td></tr>
+<tr><td style="text-align: right;"> 88</td><td style="text-align: right;">        -4</td></tr>
+<tr><td style="text-align: right;">108</td><td style="text-align: right;">        -8</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgb4820bf" class="outline-2">
+<h2 id="orgb4820bf"><span class="section-number-2">2</span> Models</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-org442539e" class="outline-3">
+<h3 id="org442539e"><span class="section-number-3">2.1</span> Simple Logistic Regression</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+We fit a logistic regression classifier on the regular season games.
+</p>
+<ul class="org-ul">
+<li>intercept is fixed at 0 because having lower team ID should not
+affect the winning probability, given that all other factors are
+balanced.</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">clf</span> = LogisticRegression(penalty=<span style="color: #8b2252;">'l2'</span>, fit_intercept=<span style="color: #008b8b;">False</span>, C=0.0001,
+                         verbose=<span style="color: #008b8b;">False</span>, max_iter=1000, solver=<span style="color: #8b2252;">'lbfgs'</span>)
+clf.fit(X_train, y_train)
+<span style="color: #a0522d;">pred_train</span> = pd.DataFrame({<span style="color: #8b2252;">'ID'</span>:data.loc[X_train.index, <span style="color: #8b2252;">'ID'</span>],
+                          <span style="color: #8b2252;">'Pred'</span>:clf.predict_proba(X_train)[:, 0],
+                           <span style="color: #8b2252;">'Train'</span>:<span style="color: #008b8b;">True</span>})
+<span style="color: #a0522d;">pred_test</span> = pd.DataFrame({<span style="color: #8b2252;">'ID'</span>:data.loc[X_test.index, <span style="color: #8b2252;">'ID'</span>],
+                          <span style="color: #8b2252;">'Pred'</span>:clf.predict_proba(X_test)[:, 0],
+                          <span style="color: #8b2252;">'Train'</span>:<span style="color: #008b8b;">False</span>})
+<span style="color: #a0522d;">pred</span> = pd.concat([pred_train, pred_test])[[<span style="color: #8b2252;">'ID'</span>, <span style="color: #8b2252;">'Pred'</span>, <span style="color: #8b2252;">'Train'</span>]]
+print_df(pred.head())
+</pre>
+</div>
+
+<table>
+<thead>
+<tr><th style="text-align: right;">   </th><th style="text-align: right;">            ID</th><th style="text-align: right;">    Pred</th><th>Train  </th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 26</td><td style="text-align: right;">2015_1186_1411</td><td style="text-align: right;">0.48241 </td><td>True   </td></tr>
+<tr><td style="text-align: right;"> 42</td><td style="text-align: right;">2015_1214_1234</td><td style="text-align: right;">0.578531</td><td>True   </td></tr>
+<tr><td style="text-align: right;"> 47</td><td style="text-align: right;">2015_1248_1352</td><td style="text-align: right;">0.5     </td><td>True   </td></tr>
+<tr><td style="text-align: right;"> 88</td><td style="text-align: right;">2015_1295_1400</td><td style="text-align: right;">0.535136</td><td>True   </td></tr>
+<tr><td style="text-align: right;">108</td><td style="text-align: right;">2015_1308_1455</td><td style="text-align: right;">0.569926</td><td>True   </td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org764eafa" class="outline-2">
+<h2 id="org764eafa"><span class="section-number-2">3</span> Evaluation</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-orgf2a8ff4" class="outline-3">
+<h3 id="orgf2a8ff4"><span class="section-number-3">3.1</span> LogLoss</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">train_loss</span> = log_loss(y_train, pred.loc[pred.Train, <span style="color: #8b2252;">'Pred'</span>])
+<span style="color: #a0522d;">test_loss</span> = log_loss(y_test, pred.loc[~pred.Train, <span style="color: #8b2252;">'Pred'</span>])
+<span style="color: #a020f0;">print</span>(<span style="color: #8b2252;">'train log_loss:{:0.2f}\ttest log_loss:{:0.2f}'</span>.<span style="color: #483d8b;">format</span>(train_loss, test_loss))
+</pre>
+</div>
+
+<pre class="example">
+train log_loss:0.75	test log_loss:0.77
+
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgd3a13d8" class="outline-3">
+<h3 id="orgd3a13d8"><span class="section-number-3">3.2</span> Accuracy</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+Although accuracy is not directly relevant for evaluation, it might be
+useful for ensembling the predictions.
+</p>
+<ul class="org-ul">
+<li>ROC or PR is irrelevant for this data representation. Having a lower
+team ID is arbitrary so we should always use 0.5 as the threshold
+for classification.</li>
+</ul>
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">train_acc</span> = np.mean(y_train == clf.predict(X_train))
+<span style="color: #a0522d;">test_acc</span> = np.mean(y_test == clf.predict(X_test))
+<span style="color: #a020f0;">print</span>(<span style="color: #8b2252;">'train accuracy:{:0.2f}\ttest accuracy:{:0.2f}'</span>.<span style="color: #483d8b;">format</span>(train_acc, test_acc))
+</pre>
+</div>
+
+<pre class="example">
+train accuracy:0.72	test accuracy:0.79
+
+</pre>
+</div>
+</div>
+</div>
+
+<div id="outline-container-orgcc45f5c" class="outline-2">
+<h2 id="orgcc45f5c"><span class="section-number-2">4</span> Next Steps</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-org75ec8a7" class="outline-3">
+<h3 id="org75ec8a7"><span class="section-number-3">4.1</span> Data</h3>
+<div class="outline-text-3" id="text-4-1">
+<ul class="org-ul">
+<li>Use more features</li>
+<li>Perform feature engineering</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgaec4a77" class="outline-3">
+<h3 id="orgaec4a77"><span class="section-number-3">4.2</span> Models</h3>
+<div class="outline-text-3" id="text-4-2">
+<ul class="org-ul">
+<li>Fit more complex models
+<ul class="org-ul">
+<li>expand features</li>
+<li>black-box models</li>
+<li>emsemble</li>
+</ul></li>
+<li>Create model API and save predictions (for automated evaluation below)</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-org1f3fa63" class="outline-3">
+<h3 id="org1f3fa63"><span class="section-number-3">4.3</span> Evaluation</h3>
+<div class="outline-text-3" id="text-4-3">
+<ul class="org-ul">
+<li>Automate evaluation via cross-validation
+<ul class="org-ul">
+<li>Split data into folds</li>
+<li>Call model API to save predictions on each fold
+<ul class="org-ul">
+<li>do this for many models with various hyperparameter settings</li>
+</ul></li>
+<li>Load predictions and calculate metrics to compare performance</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</div>

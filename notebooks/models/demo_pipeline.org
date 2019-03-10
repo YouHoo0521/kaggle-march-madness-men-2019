@@ -1,0 +1,175 @@
+#+OPTIONS: ^:nil toc:nil
+#+BEGIN_EXPORT html
+---
+layout: page
+title: Logistic Regression Pipeline Example
+---
+
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+#+END_EXPORT
+
+This page is an example of a minimal pipeline for a logistic
+regression classifier for the 2015 season.
+
+#+TOC: headlines 2
+
+* Setup
+** Load Packages
+#+begin_src python :session
+  import pandas as pd
+  import numpy as np
+  from sklearn.metrics import log_loss
+  from sklearn.linear_model import LogisticRegression
+  from src import utils  # see src/ folder in project repo
+  from src.data import make_dataset
+#+end_src
+
+#+RESULTS:
+
+** Helper Functions
+#+begin_src python :session
+  print_df = utils.create_print_df_fcn(tablefmt='html');
+  show_fig = utils.create_show_fig_fcn(img_dir='models/classifier_pipeline_example/');
+#+end_src
+
+#+RESULTS:
+
+** Load Data
+#+begin_src python :session :exports both :results output html :eval never-export
+  data = make_dataset.get_train_data_v1(2015)
+  print_df(data.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  season</th><th style="text-align: right;">  daynum</th><th style="text-align: right;">  numot</th><th style="text-align: right;">  tourney</th><th style="text-align: right;">  team1</th><th style="text-align: right;">  team2</th><th style="text-align: right;">  score1</th><th style="text-align: right;">  score2</th><th style="text-align: right;">  loc</th><th style="text-align: right;">  team1win</th><th>seed1  </th><th style="text-align: right;">  seednum1</th><th style="text-align: right;">  seed2</th><th style="text-align: right;">  seednum2</th><th style="text-align: right;">  seeddiff</th><th style="text-align: right;">            ID</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1103</td><td style="text-align: right;">   1420</td><td style="text-align: right;">      74</td><td style="text-align: right;">      57</td><td style="text-align: right;"> 1103</td><td style="text-align: right;">         1</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1103_1420</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1104</td><td style="text-align: right;">   1406</td><td style="text-align: right;">      82</td><td style="text-align: right;">      54</td><td style="text-align: right;"> 1104</td><td style="text-align: right;">         1</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1104_1406</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1112</td><td style="text-align: right;">   1291</td><td style="text-align: right;">      78</td><td style="text-align: right;">      55</td><td style="text-align: right;"> 1112</td><td style="text-align: right;">         1</td><td>Z02    </td><td style="text-align: right;">         2</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1112_1291</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1113</td><td style="text-align: right;">   1152</td><td style="text-align: right;">      86</td><td style="text-align: right;">      50</td><td style="text-align: right;"> 1113</td><td style="text-align: right;">         1</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1113_1152</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">    2015</td><td style="text-align: right;">      11</td><td style="text-align: right;">      0</td><td style="text-align: right;">        0</td><td style="text-align: right;">   1102</td><td style="text-align: right;">   1119</td><td style="text-align: right;">      78</td><td style="text-align: right;">      84</td><td style="text-align: right;"> 1119</td><td style="text-align: right;">         0</td><td>nan    </td><td style="text-align: right;">       nan</td><td style="text-align: right;">    nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">       nan</td><td style="text-align: right;">2015_1102_1119</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+** Process Data
+We'll process the data for a logistic regression on a single feature,
+=seeddiff=, which is the difference in seeds.
+#+begin_src python :session :exports both :results output html :eval never-export
+  X_train = data.loc[data.tourney == 0, ['seeddiff']].dropna()
+  X_test = data.loc[data.tourney == 1, ['seeddiff']].dropna()
+  y_train = data.loc[X_train.index, 'team1win']
+  y_test = data.loc[X_test.index, 'team1win']
+  print_df(X_train.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+<table>
+<thead>
+<tr><th style="text-align: right;">   </th><th style="text-align: right;">  seeddiff</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 26</td><td style="text-align: right;">         2</td></tr>
+<tr><td style="text-align: right;"> 42</td><td style="text-align: right;">        -9</td></tr>
+<tr><td style="text-align: right;"> 47</td><td style="text-align: right;">         0</td></tr>
+<tr><td style="text-align: right;"> 88</td><td style="text-align: right;">        -4</td></tr>
+<tr><td style="text-align: right;">108</td><td style="text-align: right;">        -8</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+** COMMENT Process Data for Team Model
+#+begin_src python :session :exports both :results output :eval no
+  from sklearn.preprocessing import OneHotEncoder
+  teams = sorted(set(data[['team1', 'team2']].values.flatten()))
+  enc = OneHotEncoder(sparse=False, categories=[teams, teams])
+  enc.fit(data[['team1', 'team2']])
+  X_train = enc.transform(data.loc[data.tourney == 0, ['team1', 'team2']])
+  X_test = enc.transform(data.loc[data.tourney == 1, ['team1', 'team2']])
+  y_train = data.loc[data.tourney == 0, 'team1win'].values
+  y_test = data.loc[data.tourney == 1, 'team1win'].values
+#+end_src
+
+* Models
+** Simple Logistic Regression
+We fit a logistic regression classifier on the regular season games.
+- intercept is fixed at 0 because having lower team ID should not
+  affect the winning probability, given that all other factors are
+  balanced.
+#+begin_src python :session :exports both :results output html :eval never-export
+  clf = LogisticRegression(penalty='l2', fit_intercept=False, C=0.0001,
+			   verbose=False, max_iter=1000, solver='lbfgs')
+  clf.fit(X_train, y_train)
+  pred_train = pd.DataFrame({'ID':data.loc[X_train.index, 'ID'],
+			    'Pred':clf.predict_proba(X_train)[:, 0],
+			     'Train':True})
+  pred_test = pd.DataFrame({'ID':data.loc[X_test.index, 'ID'],
+			    'Pred':clf.predict_proba(X_test)[:, 0],
+			    'Train':False})
+  pred = pd.concat([pred_train, pred_test])[['ID', 'Pred', 'Train']]
+  print_df(pred.head())
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+<table>
+<thead>
+<tr><th style="text-align: right;">   </th><th style="text-align: right;">            ID</th><th style="text-align: right;">    Pred</th><th>Train  </th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 26</td><td style="text-align: right;">2015_1186_1411</td><td style="text-align: right;">0.48241 </td><td>True   </td></tr>
+<tr><td style="text-align: right;"> 42</td><td style="text-align: right;">2015_1214_1234</td><td style="text-align: right;">0.578531</td><td>True   </td></tr>
+<tr><td style="text-align: right;"> 47</td><td style="text-align: right;">2015_1248_1352</td><td style="text-align: right;">0.5     </td><td>True   </td></tr>
+<tr><td style="text-align: right;"> 88</td><td style="text-align: right;">2015_1295_1400</td><td style="text-align: right;">0.535136</td><td>True   </td></tr>
+<tr><td style="text-align: right;">108</td><td style="text-align: right;">2015_1308_1455</td><td style="text-align: right;">0.569926</td><td>True   </td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+* Evaluation
+** LogLoss
+#+begin_src python :session :exports both :results output :eval never-export
+  train_loss = log_loss(y_train, pred.loc[pred.Train, 'Pred'])
+  test_loss = log_loss(y_test, pred.loc[~pred.Train, 'Pred'])
+  print('train log_loss:{:0.2f}\ttest log_loss:{:0.2f}'.format(train_loss, test_loss))
+#+end_src
+
+#+RESULTS:
+: train log_loss:0.75	test log_loss:0.77
+
+** Accuracy
+Although accuracy is not directly relevant for evaluation, it might be
+useful for ensembling the predictions.
+- ROC or PR is irrelevant for this data representation. Having a lower
+  team ID is arbitrary so we should always use 0.5 as the threshold
+  for classification.
+#+begin_src python :session :exports both :results output :eval never-export
+  train_acc = np.mean(y_train == clf.predict(X_train))
+  test_acc = np.mean(y_test == clf.predict(X_test))
+  print('train accuracy:{:0.2f}\ttest accuracy:{:0.2f}'.format(train_acc, test_acc))
+#+end_src
+
+#+RESULTS:
+: train accuracy:0.72	test accuracy:0.79
+
+* Next Steps
+** Data
+- Use more features
+- Perform feature engineering
+** Models
+- Fit more complex models
+  - expand features
+  - black-box models
+  - emsemble
+- Create model API and save predictions (for automated evaluation below)
+** Evaluation
+- Automate evaluation via cross-validation
+  - Split data into folds
+  - Call model API to save predictions on each fold
+    - do this for many models with various hyperparameter settings
+  - Load predictions and calculate metrics to compare performance

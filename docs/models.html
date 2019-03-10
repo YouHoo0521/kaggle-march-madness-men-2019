@@ -3,12 +3,46 @@ layout: default
 title: Models
 ---
 
-<div id="outline-container-org9024de2" class="outline-2">
-<h2 id="org9024de2">Models</h2>
-<div class="outline-text-2" id="text-org9024de2">
+<div id="outline-container-org83cee85" class="outline-2">
+<h2 id="org83cee85">Benchmark Models</h2>
+<div class="outline-text-2" id="text-org83cee85">
 <ul class="org-ul">
 <li><a href="./models/benchmark.html">Benchmark Models</a></li>
-<li><a href="./models/bradley_terry.html">Bradley-Terry Model</a></li>
 </ul>
+</div>
+</div>
+
+<div id="outline-container-org36195b3" class="outline-2">
+<h2 id="org36195b3">ML Pipeline Demo</h2>
+<div class="outline-text-2" id="text-org36195b3">
+<p>
+Here is an example workflow for a single classifier: <a href="./models/demo_pipeline.html">Pipeline Demo</a>
+</p>
+
+<p>
+We'll want to automate this pipeline process so that we can swap out
+the following parts for experimentation
+</p>
+<ul class="org-ul">
+<li>data processing and feature engineering</li>
+<li>classifier (and hyperparameters)</li>
+<li>post processing or ensemble methods</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-orgae4c146" class="outline-2">
+<h2 id="orgae4c146">Bayesian Inference</h2>
+<div class="outline-text-2" id="text-orgae4c146">
+<p>
+An alternative approach to the typical pointwise prediction is to
+perform full Bayesian inference. Here is an example implementation of
+a logistic regression model in <code>pystan</code>: <a href="./models/bradley_terry.html">Bradley-Terry Model</a>
+</p>
+
+<p>
+With hierarchical Bayesian inference, we can build complex, but
+interpretable models.
+</p>
 </div>
 </div>

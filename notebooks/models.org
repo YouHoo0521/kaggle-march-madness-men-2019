@@ -6,7 +6,22 @@ title: Models
 ---
 #+END_EXPORT
 
-* Models
-
+* Benchmark Models
 - [[./models/benchmark.org][Benchmark Models]]
-- [[./models/bradley_terry.org][Bradley-Terry Model]]
+
+* ML Pipeline Demo
+Here is an example workflow for a single classifier: [[./models/demo_pipeline.org][Pipeline Demo]]
+  
+We'll want to automate this pipeline process so that we can swap out
+the following parts for experimentation
+- data processing and feature engineering
+- classifier (and hyperparameters)
+- post processing or ensemble methods
+
+* Bayesian Inference
+An alternative approach to the typical pointwise prediction is to
+perform full Bayesian inference. Here is an example implementation of
+a logistic regression model in =pystan=: [[./models/bradley_terry.org][Bradley-Terry Model]]
+
+With hierarchical Bayesian inference, we can build complex, but
+interpretable models.
