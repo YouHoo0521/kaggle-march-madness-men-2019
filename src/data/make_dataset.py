@@ -1,14 +1,22 @@
 import pandas as pd
 import numpy as np
+import os
+from src.utils import get_project_root
+
+
+DATAFILES_BASEDIR = os.path.join(get_project_root(), 'input/datafiles/')
 
 
 def get_train_data_v1(season=None):
     ##################################################
     # read data
     ##################################################
-    RegularSeasonCompactResults = pd.read_csv('../../input/datafiles/RegularSeasonCompactResults.csv')
-    NCAATourneyCompactResults = pd.read_csv('../../input/datafiles/NCAATourneyCompactResults.csv')
-    NCAATourneySeeds = pd.read_csv('../../input/datafiles/NCAATourneySeeds.csv')
+    RegularSeasonCompactResults = pd.read_csv(
+        os.path.join(DATAFILES_BASEDIR, 'RegularSeasonCompactResults.csv'))
+    NCAATourneyCompactResults = pd.read_csv(
+        os.path.join(DATAFILES_BASEDIR, 'NCAATourneyCompactResults.csv'))
+    NCAATourneySeeds = pd.read_csv(
+        os.path.join(DATAFILES_BASEDIR, 'NCAATourneySeeds.csv'))
     ##################################################
     # process data
     ##################################################
