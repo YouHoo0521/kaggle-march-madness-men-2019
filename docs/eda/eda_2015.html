@@ -3,6 +3,8 @@ layout: page
 title: EDA - Season 2015
 ---
 
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
 <div id="table-of-contents">
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents">
@@ -26,19 +28,15 @@ title: EDA - Season 2015
 <li><a href="#orgafab0bb">3.6. Distribution of score difference by losing team's points</a></li>
 </ul>
 </li>
+<li><a href="#org9243739">4. Questions</a>
+<ul>
+<li><a href="#orgc9ccd3e">4.1. How many times does a pair of teams play each other in a season?</a></li>
+<li><a href="#orgee8e13a">4.2. Does the outcome of a regular season game between team1 and team2 predict the outcome in the tournament?</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-      inlineMath: [['$','$']]
-    }
-  });
-</script>
-<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 
 <div id="outline-container-orgd54cf0b" class="outline-2">
 <h2 id="orgd54cf0b"><span class="section-number-2">1</span> Motivation</h2>
@@ -349,6 +347,74 @@ show_fig(<span style="color: #8b2252;">'scatter_scorediff_by_losingpoints.png'</
 
 <p>
 This plot shows the same information as the previous one.
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-org9243739" class="outline-2">
+<h2 id="org9243739"><span class="section-number-2">4</span> Questions</h2>
+<div class="outline-text-2" id="text-4">
+</div>
+<div id="outline-container-orgc9ccd3e" class="outline-3">
+<h3 id="orgc9ccd3e"><span class="section-number-3">4.1</span> How many times does a pair of teams play each other in a season?</h3>
+<div class="outline-text-3" id="text-4-1">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">num_encounters</span> = data.groupby([<span style="color: #8b2252;">'team1'</span>, <span style="color: #8b2252;">'team2'</span>]).size().value_counts()
+print_df(pd.DataFrame({<span style="color: #8b2252;">'num_encounters'</span>:num_encounters.index,
+                       <span style="color: #8b2252;">'count'</span>: num_encounters,
+                       <span style="color: #8b2252;">'prop'</span>: num_encounters / num_encounters.<span style="color: #483d8b;">sum</span>()})
+         .set_index(<span style="color: #8b2252;">'num_encounters'</span>))
+
+</pre>
+</div>
+
+<table>
+<thead>
+<tr><th style="text-align: right;">  num_encounters</th><th style="text-align: right;">  count</th><th style="text-align: right;">     prop</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;">               1</td><td style="text-align: right;">   2464</td><td style="text-align: right;">0.642839 </td></tr>
+<tr><td style="text-align: right;">               2</td><td style="text-align: right;">   1150</td><td style="text-align: right;">0.300026 </td></tr>
+<tr><td style="text-align: right;">               3</td><td style="text-align: right;">    219</td><td style="text-align: right;">0.0571354</td></tr>
+</tbody>
+</table>
+
+<p>
+Only about 30% of all pairs play twice in a season. About 5.7% of all
+pairs play three times.
+</p>
+</div>
+</div>
+
+<div id="outline-container-orgee8e13a" class="outline-3">
+<h3 id="orgee8e13a"><span class="section-number-3">4.2</span> Does the outcome of a regular season game between team1 and team2 predict the outcome in the tournament?</h3>
+<div class="outline-text-3" id="text-4-2">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">tourney_matchups</span> = data.loc[data.tourney == 1]
+<span style="color: #a0522d;">regular_matchups</span> = data.loc[data.tourney == 0]
+<span style="color: #a0522d;">joined_matchups</span> = pd.merge(regular_matchups, tourney_matchups, on=[<span style="color: #8b2252;">'team1'</span>, <span style="color: #8b2252;">'team2'</span>], suffixes=(<span style="color: #8b2252;">'_regular'</span>, <span style="color: #8b2252;">'_tourney'</span>))
+print_df(joined_matchups[[<span style="color: #8b2252;">'team1'</span>, <span style="color: #8b2252;">'team2'</span>, <span style="color: #8b2252;">'seednum1_tourney'</span>, <span style="color: #8b2252;">'seednum2_tourney'</span>, <span style="color: #8b2252;">'team1win_tourney'</span>, <span style="color: #8b2252;">'team1win_regular'</span>]])
+</pre>
+</div>
+
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  team1</th><th style="text-align: right;">  team2</th><th style="text-align: right;">  seednum1_tourney</th><th style="text-align: right;">  seednum2_tourney</th><th style="text-align: right;">  team1win_tourney</th><th style="text-align: right;">  team1win_regular</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">   1181</td><td style="text-align: right;">   1277</td><td style="text-align: right;">                 1</td><td style="text-align: right;">                 7</td><td style="text-align: right;">                 1</td><td style="text-align: right;">                 1</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">   1412</td><td style="text-align: right;">   1417</td><td style="text-align: right;">                14</td><td style="text-align: right;">                11</td><td style="text-align: right;">                 0</td><td style="text-align: right;">                 0</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">   1181</td><td style="text-align: right;">   1458</td><td style="text-align: right;">                 1</td><td style="text-align: right;">                 1</td><td style="text-align: right;">                 1</td><td style="text-align: right;">                 1</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">   1211</td><td style="text-align: right;">   1417</td><td style="text-align: right;">                 2</td><td style="text-align: right;">                11</td><td style="text-align: right;">                 1</td><td style="text-align: right;">                 1</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">   1257</td><td style="text-align: right;">   1301</td><td style="text-align: right;">                 4</td><td style="text-align: right;">                 8</td><td style="text-align: right;">                 1</td><td style="text-align: right;">                 0</td></tr>
+</tbody>
+</table>
+
+<p>
+In 2015, there's only five regular season games between two teams that
+played in a tournament game. In four out of five cases, the outcome from
+the tournament agreed with the outcome from the regular season.
 </p>
 </div>
 </div>

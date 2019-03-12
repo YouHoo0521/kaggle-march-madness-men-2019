@@ -4,21 +4,11 @@
 layout: page
 title: EDA - Season 2015
 ---
+
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 #+END_EXPORT
 
 #+TOC: headlines 2
-
-#+BEGIN_EXPORT html
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    tex2jax: {
-      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
-      inlineMath: [['$','$']]
-    }
-  });
-</script>
-<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
-#+END_EXPORT
 
 * Motivation
 Here we explore the data from 2015 season. 2015 was chosen arbitrarily
@@ -241,3 +231,59 @@ the play-clock.
 [[file:../figs/eda/eda_2015/scatter_scorediff_by_losingpoints.png]]
 
 This plot shows the same information as the previous one.
+
+* Questions
+** How many times does a pair of teams play each other in a season?
+#+begin_src python :session :exports both :results output html :eval never-export
+  num_encounters = data.groupby(['team1', 'team2']).size().value_counts()
+  print_df(pd.DataFrame({'num_encounters':num_encounters.index,
+			 'count': num_encounters,
+			 'prop': num_encounters / num_encounters.sum()})
+	   .set_index('num_encounters'))
+
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+<table>
+<thead>
+<tr><th style="text-align: right;">  num_encounters</th><th style="text-align: right;">  count</th><th style="text-align: right;">     prop</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;">               1</td><td style="text-align: right;">   2464</td><td style="text-align: right;">0.642839 </td></tr>
+<tr><td style="text-align: right;">               2</td><td style="text-align: right;">   1150</td><td style="text-align: right;">0.300026 </td></tr>
+<tr><td style="text-align: right;">               3</td><td style="text-align: right;">    219</td><td style="text-align: right;">0.0571354</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+Only about 30% of all pairs play twice in a season. About 5.7% of all
+pairs play three times.
+
+** Does the outcome of a regular season game between team1 and team2 predict the outcome in the tournament?
+#+begin_src python :session :exports both :results output html :eval never-export
+  tourney_matchups = data.loc[data.tourney == 1]
+  regular_matchups = data.loc[data.tourney == 0]
+  joined_matchups = pd.merge(regular_matchups, tourney_matchups, on=['team1', 'team2'], suffixes=('_regular', '_tourney'))
+  print_df(joined_matchups[['team1', 'team2', 'seednum1_tourney', 'seednum2_tourney', 'team1win_tourney', 'team1win_regular']])
+#+end_src
+
+#+RESULTS:
+#+BEGIN_EXPORT html
+<table>
+<thead>
+<tr><th style="text-align: right;">  </th><th style="text-align: right;">  team1</th><th style="text-align: right;">  team2</th><th style="text-align: right;">  seednum1_tourney</th><th style="text-align: right;">  seednum2_tourney</th><th style="text-align: right;">  team1win_tourney</th><th style="text-align: right;">  team1win_regular</th></tr>
+</thead>
+<tbody>
+<tr><td style="text-align: right;"> 0</td><td style="text-align: right;">   1181</td><td style="text-align: right;">   1277</td><td style="text-align: right;">                 1</td><td style="text-align: right;">                 7</td><td style="text-align: right;">                 1</td><td style="text-align: right;">                 1</td></tr>
+<tr><td style="text-align: right;"> 1</td><td style="text-align: right;">   1412</td><td style="text-align: right;">   1417</td><td style="text-align: right;">                14</td><td style="text-align: right;">                11</td><td style="text-align: right;">                 0</td><td style="text-align: right;">                 0</td></tr>
+<tr><td style="text-align: right;"> 2</td><td style="text-align: right;">   1181</td><td style="text-align: right;">   1458</td><td style="text-align: right;">                 1</td><td style="text-align: right;">                 1</td><td style="text-align: right;">                 1</td><td style="text-align: right;">                 1</td></tr>
+<tr><td style="text-align: right;"> 3</td><td style="text-align: right;">   1211</td><td style="text-align: right;">   1417</td><td style="text-align: right;">                 2</td><td style="text-align: right;">                11</td><td style="text-align: right;">                 1</td><td style="text-align: right;">                 1</td></tr>
+<tr><td style="text-align: right;"> 4</td><td style="text-align: right;">   1257</td><td style="text-align: right;">   1301</td><td style="text-align: right;">                 4</td><td style="text-align: right;">                 8</td><td style="text-align: right;">                 1</td><td style="text-align: right;">                 0</td></tr>
+</tbody>
+</table>
+#+END_EXPORT
+
+In 2015, there's only five regular season games between two teams that
+played in a tournament game. In four out of five cases, the outcome from
+the tournament agreed with the outcome from the regular season.
