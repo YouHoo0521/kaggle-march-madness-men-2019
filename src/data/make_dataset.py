@@ -63,7 +63,7 @@ def get_train_data_v1(season=None):
 
 def get_boxscore_dataset_v1(season=None):
     '''
-    Extend train_data_v1 with seasonwise mean/std boxscore columns for each team
+    Extend train_data_v1 with seasonwise mean/std boxscore columns for each team and opponent
     '''
     data = get_train_data_v1(season=season) # main data
     ##################################################
@@ -71,35 +71,39 @@ def get_boxscore_dataset_v1(season=None):
     ##################################################
     RegularSeasonDetailedResults = pd.read_csv(
         os.path.join(DATAFILES_BASEDIR, 'RegularSeasonDetailedResults.csv'))
-    # TODO: calculate boxscore differentials here
-    #       e.g. WFGA_diff, LFGA_diff, etc.
     ##################################################
     # column processing
     ##################################################
     cols = RegularSeasonDetailedResults.columns
-    w_cols = cols.str.slice(0, 1) == 'W'
+    w_cols = (cols.str.slice(0, 1) == 'W') & (~cols.isin(['WLoc']))
     l_cols = cols.str.slice(0, 1) == 'L'
-    common_cols = ~(w_cols | l_cols)
     box_colnames = cols[w_cols].str.slice(1)  # remove 'W' and 'L'
+    # for reversing W columns with L cols
+    reverse_dict = dict(zip(list('W' + box_colnames) + list('L' + box_colnames),
+                            list('L' + box_colnames) + list('W' + box_colnames)))
+    # for converting W and L boxstats to team and opponent boxstats
+    rename_dict = dict(zip(list('W' + box_colnames) + list('L' + box_colnames),
+                           list(box_colnames + '_team') + list(box_colnames + '_opp')))
     ##################################################
-    # stack the winning and losing team dataframes
+    # stack the original and reversed dataframes
     ##################################################
     RegularSeasonDetailedResultsStacked = pd.concat(
-        [RegularSeasonDetailedResults[cols[common_cols | col_idx]].rename(
-            dict(zip(cols[col_idx], box_colnames)),
-            axis=1)
-         for col_idx in [w_cols, l_cols]]
-    ).reset_index(drop=True)
+        [RegularSeasonDetailedResults,
+         RegularSeasonDetailedResults.rename(reverse_dict, axis=1)],
+        sort=True).rename(rename_dict, axis=1)
     n = RegularSeasonDetailedResults.shape[0]
     RegularSeasonDetailedResultsStacked['win'] = np.array([True] * n + [False] * n)
     ##################################################
     # calculate boxscore stats
     ##################################################
-    df_boxstat = (RegularSeasonDetailedResultsStacked
-                  .groupby(['Season', 'TeamID'])
+    df_boxstat = (RegularSeasonDetailedResultsStacked[list(rename_dict.values()) + ['Season']]
+                  .groupby(['Season', 'TeamID_team'])
                   .agg(['mean', 'std']))
     df_boxstat.columns = ['_'.join(col).strip() for col in df_boxstat.columns.values]
     df_boxstat.columns = df_boxstat.columns.str.lower()
+    drop_cols = df_boxstat.columns[df_boxstat.columns.str.contains('teamid_opp')]
+    df_boxstat = df_boxstat.drop(drop_cols, axis=1)
+    df_boxstat.index.names = ['Season', 'TeamID']
     ##################################################
     # merge with main data
     ##################################################
