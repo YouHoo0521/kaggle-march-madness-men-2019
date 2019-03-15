@@ -61,5 +61,58 @@ def get_train_data_v1(season=None):
     return data
 
 
+def get_boxscore_dataset_v1(season=None):
+    '''
+    Extend train_data_v1 with seasonwise mean/std boxscore columns for each team
+    '''
+    data = get_train_data_v1(season=season) # main data
+    ##################################################
+    # regular season boxscore data
+    ##################################################
+    RegularSeasonDetailedResults = pd.read_csv(
+        os.path.join(DATAFILES_BASEDIR, 'RegularSeasonDetailedResults.csv'))
+    # TODO: calculate boxscore differentials here
+    #       e.g. WFGA_diff, LFGA_diff, etc.
+    ##################################################
+    # column processing
+    ##################################################
+    cols = RegularSeasonDetailedResults.columns
+    w_cols = cols.str.slice(0, 1) == 'W'
+    l_cols = cols.str.slice(0, 1) == 'L'
+    common_cols = ~(w_cols | l_cols)
+    box_colnames = cols[w_cols].str.slice(1)  # remove 'W' and 'L'
+    ##################################################
+    # stack the winning and losing team dataframes
+    ##################################################
+    RegularSeasonDetailedResultsStacked = pd.concat(
+        [RegularSeasonDetailedResults[cols[common_cols | col_idx]].rename(
+            dict(zip(cols[col_idx], box_colnames)),
+            axis=1)
+         for col_idx in [w_cols, l_cols]]
+    ).reset_index(drop=True)
+    n = RegularSeasonDetailedResults.shape[0]
+    RegularSeasonDetailedResultsStacked['win'] = np.array([True] * n + [False] * n)
+    ##################################################
+    # calculate boxscore stats
+    ##################################################
+    df_boxstat = (RegularSeasonDetailedResultsStacked
+                  .groupby(['Season', 'TeamID'])
+                  .agg(['mean', 'std']))
+    df_boxstat.columns = ['_'.join(col).strip() for col in df_boxstat.columns.values]
+    df_boxstat.columns = df_boxstat.columns.str.lower()
+    ##################################################
+    # merge with main data
+    ##################################################
+    data = (data
+            .pipe(pd.merge, df_boxstat,
+                  left_on=['season', 'team1'], right_index=True,
+                  how='left')
+            .pipe(pd.merge, df_boxstat,
+                  left_on=['season', 'team2'], right_index=True,
+                  how='left', suffixes=('1', '2'))
+            )
+    return data
+
+
 if __name__ == '__main__':
     pass
