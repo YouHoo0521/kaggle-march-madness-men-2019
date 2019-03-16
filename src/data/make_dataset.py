@@ -17,6 +17,14 @@ def get_train_data_v1(season=None):
         os.path.join(DATAFILES_BASEDIR, 'NCAATourneyCompactResults.csv'))
     NCAATourneySeeds = pd.read_csv(
         os.path.join(DATAFILES_BASEDIR, 'NCAATourneySeeds.csv'))
+    TeamConferences = pd.read_csv(
+        os.path.join(DATAFILES_BASEDIR, 'TeamConferences.csv'))
+    Conferences = pd.read_csv(
+        os.path.join(DATAFILES_BASEDIR, 'Conferences.csv'))
+    Teams = pd.read_csv(
+        os.path.join(DATAFILES_BASEDIR, 'Teams.csv'))
+    TeamConferences = (pd.merge(TeamConferences, Conferences, on='ConfAbbrev')
+                       .rename({'Description': 'conf_descr'}, axis=1))
     ##################################################
     # process data
     ##################################################
@@ -53,6 +61,27 @@ def get_train_data_v1(season=None):
                   left_on=['Season', 'team2'], right_on=['Season', 'TeamID'],
                   how='left', suffixes=('1', '2'))
             )
+    ##################################################
+    # get conferences
+    data = (data
+            .pipe(pd.merge, TeamConferences,
+                  left_on=['Season', 'team1'], right_on=['Season', 'TeamID'],
+                  how='left')
+            .pipe(pd.merge, TeamConferences,
+                  left_on=['Season', 'team2'], right_on=['Season', 'TeamID'],
+                  how='left', suffixes=('1', '2'))
+            )
+    ##################################################
+    # get team names
+    data = (data
+            .pipe(pd.merge, Teams,
+                  left_on=['team1'], right_on=['TeamID'],
+                  how='left')
+            .pipe(pd.merge, Teams,
+                  left_on=['team2'], right_on=['TeamID'],
+                  how='left', suffixes=('1', '2'))
+            )
+    # calculate seed diff
     data['seeddiff'] = data['seednum2'] - data['seednum1']
     data = data.drop(['TeamID1', 'TeamID2', 'WTeamID', 'WScore', 'LTeamID', 'LScore', 'WLoc'], axis=1)
     data.columns = data.columns.str.lower()
