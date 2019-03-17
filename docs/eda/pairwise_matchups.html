@@ -27,13 +27,20 @@ pairwise matchup data</li>
 <li><a href="#org958a6e4">1.1. Load Packages</a></li>
 <li><a href="#org06dc54d">1.2. Helper Functions</a></li>
 <li><a href="#orgb24fd8f">1.3. Load Data</a></li>
-<li><a href="#org7f034d7">1.4. Basic Description</a></li>
+<li><a href="#org0eb3bda">1.4. Process Data</a></li>
+<li><a href="#org7f034d7">1.5. Basic Description</a></li>
 </ul>
 </li>
 <li><a href="#org148f468">2. Visualizations</a>
 <ul>
-<li><a href="#orgf151430">2.1. Heatmap of pairwise matchups</a></li>
-<li><a href="#org79997d8">2.2. Heatmap of pairwise matchups</a></li>
+<li><a href="#orgb727c31">2.1. Heatmap of pairwise matchups - Regular</a></li>
+<li><a href="#orgf2272fd">2.2. Heatmap of pairwise matchups - Tournament</a></li>
+</ul>
+</li>
+<li><a href="#org49db515">3. Matrix completion by nuclear norm minimization</a>
+<ul>
+<li><a href="#orga3c47fc">3.1. Accuracy</a></li>
+<li><a href="#orgf4b6a7f">3.2. Prediction vs Actual</a></li>
 </ul>
 </li>
 </ul>
@@ -65,8 +72,8 @@ pairwise matchup data</li>
 <h3 id="org06dc54d"><span class="section-number-3">1.2</span> Helper Functions</h3>
 <div class="outline-text-3" id="text-1-2">
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #a0522d;">print_df</span> = utils.create_print_df_fcn(tablefmt=<span style="color: #8b2252;">'html'</span>);
-<span style="color: #a0522d;">show_fig</span> = utils.create_show_fig_fcn(img_dir=<span style="color: #8b2252;">'eda/eda_{}_v2/'</span>.<span style="color: #483d8b;">format</span>(SEASON));
+<pre class="src src-python"><span style="color: #a0522d;">print_df</span> = utils.create_print_df_fcn(tablefmt=<span style="color: #8b2252;">'orgtbl'</span>);
+<span style="color: #a0522d;">show_fig</span> = utils.create_show_fig_fcn(img_dir=<span style="color: #8b2252;">'eda/pairwise_matchups/'</span>.<span style="color: #483d8b;">format</span>(SEASON));
 </pre>
 </div>
 </div>
@@ -101,9 +108,28 @@ Data size = (5421, 141)
 </div>
 </div>
 
-<div id="outline-container-org7f034d7" class="outline-3">
-<h3 id="org7f034d7"><span class="section-number-3">1.4</span> Basic Description</h3>
+<div id="outline-container-org0eb3bda" class="outline-3">
+<h3 id="org0eb3bda"><span class="section-number-3">1.4</span> Process Data</h3>
 <div class="outline-text-3" id="text-1-4">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">TeamConferences</span> = (pd.read_csv(
+<span style="background-color: #f2f2f2;"> </span>   os.path.join(utils.get_project_root(), <span style="color: #8b2252;">'input/datafiles/TeamConferences.csv'</span>))
+                   .pipe(<span style="color: #a020f0;">lambda</span> x:x[x[<span style="color: #8b2252;">'Season'</span>] == SEASON])
+                   )
+<span style="color: #a0522d;">teams_ordered</span> = <span style="color: #483d8b;">list</span>(TeamConferences.sort_values([<span style="color: #8b2252;">'ConfAbbrev'</span>, <span style="color: #8b2252;">'TeamID'</span>])[<span style="color: #8b2252;">'TeamID'</span>])
+<span style="color: #a0522d;">teams_pairwise</span> = [(t1, t2) <span style="color: #a020f0;">for</span> t1 <span style="color: #a020f0;">in</span> teams_ordered <span style="color: #a020f0;">for</span> t2 <span style="color: #a020f0;">in</span> teams_ordered]
+</pre>
+</div>
+
+<p>
+<a href=""></a>
+</p>
+</div>
+</div>
+
+<div id="outline-container-org7f034d7" class="outline-3">
+<h3 id="org7f034d7"><span class="section-number-3">1.5</span> Basic Description</h3>
+<div class="outline-text-3" id="text-1-5">
 <div class="org-src-container">
 <pre class="src src-python"><span style="color: #a0522d;">n_missing</span> = data.isna().<span style="color: #483d8b;">sum</span>().rename(<span style="color: #8b2252;">'n_missing'</span>)
 print_df(data.describe().append(n_missing))
@@ -126,22 +152,15 @@ print_df(data.describe().append(n_missing))
 </div>
 </div>
 </div>
-
 <div id="outline-container-org148f468" class="outline-2">
 <h2 id="org148f468"><span class="section-number-2">2</span> Visualizations</h2>
 <div class="outline-text-2" id="text-2">
 </div>
-<div id="outline-container-orgf151430" class="outline-3">
-<h3 id="orgf151430"><span class="section-number-3">2.1</span> Heatmap of pairwise matchups</h3>
+<div id="outline-container-orgb727c31" class="outline-3">
+<h3 id="orgb727c31"><span class="section-number-3">2.1</span> Heatmap of pairwise matchups - Regular</h3>
 <div class="outline-text-3" id="text-2-1">
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #a0522d;">TeamConferences</span> = (pd.read_csv(
-<span style="background-color: #f2f2f2;"> </span>   os.path.join(utils.get_project_root(), <span style="color: #8b2252;">'input/datafiles/TeamConferences.csv'</span>))
-                   .pipe(<span style="color: #a020f0;">lambda</span> x:x[x[<span style="color: #8b2252;">'Season'</span>] == SEASON])
-                   )
-<span style="color: #a0522d;">teams_ordered</span> = <span style="color: #483d8b;">list</span>(TeamConferences.sort_values([<span style="color: #8b2252;">'ConfAbbrev'</span>, <span style="color: #8b2252;">'TeamID'</span>])[<span style="color: #8b2252;">'TeamID'</span>])
-<span style="color: #a0522d;">teams_pairwise</span> = [(t1, t2) <span style="color: #a020f0;">for</span> t1 <span style="color: #a020f0;">in</span> teams_ordered <span style="color: #a020f0;">for</span> t2 <span style="color: #a020f0;">in</span> teams_ordered]
-<span style="color: #a0522d;">pairwise_matchups</span> = (data[data[<span style="color: #8b2252;">'tourney'</span>] == 0]
+<pre class="src src-python"><span style="color: #a0522d;">pairwise_matchups</span> = (data[data[<span style="color: #8b2252;">'tourney'</span>] == 0]
                      .pipe(<span style="color: #a020f0;">lambda</span> x: x.groupby([<span style="color: #8b2252;">'team1'</span>, <span style="color: #8b2252;">'team2'</span>])[<span style="color: #8b2252;">'scorediff'</span>].size() &gt; 0)
                      .reindex(teams_pairwise)
                      .fillna(<span style="color: #008b8b;">False</span>)
@@ -157,7 +176,7 @@ show_fig(<span style="color: #8b2252;">'regular_pairwise_matchup_heatmap.png'</s
 
 
 <div class="figure">
-<p><img src="../figs/eda/eda_2015_v2/regular_pairwise_matchup_heatmap.png" alt="regular_pairwise_matchup_heatmap.png" />
+<p><img src="../figs/eda/pairwise_matchups/regular_pairwise_matchup_heatmap.png" alt="regular_pairwise_matchup_heatmap.png" />
 </p>
 </div>
 
@@ -169,25 +188,19 @@ across conferences are much more sparse.
 </p>
 </div>
 </div>
-<div id="outline-container-org79997d8" class="outline-3">
-<h3 id="org79997d8"><span class="section-number-3">2.2</span> Heatmap of pairwise matchups</h3>
+<div id="outline-container-orgf2272fd" class="outline-3">
+<h3 id="orgf2272fd"><span class="section-number-3">2.2</span> Heatmap of pairwise matchups - Tournament</h3>
 <div class="outline-text-3" id="text-2-2">
 <div class="org-src-container">
-<pre class="src src-python"><span style="color: #a0522d;">TeamConferences</span> = (pd.read_csv(
-<span style="background-color: #f2f2f2;"> </span>   os.path.join(utils.get_project_root(), <span style="color: #8b2252;">'input/datafiles/TeamConferences.csv'</span>))
-                   .pipe(<span style="color: #a020f0;">lambda</span> x:x[x[<span style="color: #8b2252;">'Season'</span>] == SEASON])
-                   )
-<span style="color: #a0522d;">teams_ordered</span> = <span style="color: #483d8b;">list</span>(TeamConferences.sort_values([<span style="color: #8b2252;">'ConfAbbrev'</span>, <span style="color: #8b2252;">'TeamID'</span>])[<span style="color: #8b2252;">'TeamID'</span>])
-<span style="color: #a0522d;">teams_pairwise</span> = [(t1, t2) <span style="color: #a020f0;">for</span> t1 <span style="color: #a020f0;">in</span> teams_ordered <span style="color: #a020f0;">for</span> t2 <span style="color: #a020f0;">in</span> teams_ordered]
-<span style="color: #a0522d;">pairwise_matchups</span> = (data[data[<span style="color: #8b2252;">'tourney'</span>] == 1]
+<pre class="src src-python"><span style="color: #a0522d;">tourney_pairwise_matchups</span> = (data[data[<span style="color: #8b2252;">'tourney'</span>] == 1]
                      .pipe(<span style="color: #a020f0;">lambda</span> x: x.groupby([<span style="color: #8b2252;">'team1'</span>, <span style="color: #8b2252;">'team2'</span>])[<span style="color: #8b2252;">'scorediff'</span>].size() &gt; 0)
                      .reindex(teams_pairwise)
                      .fillna(<span style="color: #008b8b;">False</span>)
 )
-pairwise_matchups.loc[pairwise_matchups[pairwise_matchups].swaplevel().index.values] = <span style="color: #008b8b;">True</span>
-<span style="color: #a0522d;">pairwise_matchups</span> = pairwise_matchups.unstack()
+tourney_pairwise_matchups.loc[tourney_pairwise_matchups[tourney_pairwise_matchups].swaplevel().index.values] = <span style="color: #008b8b;">True</span>
+<span style="color: #a0522d;">tourney_pairwise_matchups</span> = tourney_pairwise_matchups.unstack()
 <span style="color: #a0522d;">fig</span>, <span style="color: #a0522d;">ax</span> = plt.subplots(figsize=(10, 10))
-sns.heatmap(pairwise_matchups.loc[teams_ordered, teams_ordered], ax=ax, cbar=<span style="color: #008b8b;">False</span>)
+sns.heatmap(tourney_pairwise_matchups.loc[teams_ordered, teams_ordered], ax=ax, cbar=<span style="color: #008b8b;">False</span>)
 ax.set_title(<span style="color: #8b2252;">'Tourney Season Pairwise Matchups'</span>)
 show_fig(<span style="color: #8b2252;">'tourney_pairwise_matchup_heatmap.png'</span>)
 </pre>
@@ -195,7 +208,7 @@ show_fig(<span style="color: #8b2252;">'tourney_pairwise_matchup_heatmap.png'</s
 
 
 <div class="figure">
-<p><img src="../figs/eda/eda_2015_v2/tourney_pairwise_matchup_heatmap.png" alt="tourney_pairwise_matchup_heatmap.png" />
+<p><img src="../figs/eda/pairwise_matchups/tourney_pairwise_matchup_heatmap.png" alt="tourney_pairwise_matchup_heatmap.png" />
 </p>
 </div>
 
@@ -203,6 +216,72 @@ show_fig(<span style="color: #8b2252;">'tourney_pairwise_matchup_heatmap.png'</s
 As shown above, most games in the tournament are played outside of the
 conference. A good model must be able to generalize to games played
 across conferences.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org49db515" class="outline-2">
+<h2 id="org49db515"><span class="section-number-2">3</span> Matrix completion by nuclear norm minimization</h2>
+<div class="outline-text-2" id="text-3">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a020f0;">from</span> fancyimpute <span style="color: #a020f0;">import</span> NuclearNormMinimization
+
+<span style="color: #a0522d;">pairwise_scorediff</span> = (data[data[<span style="color: #8b2252;">'tourney'</span>] == 0]
+                     .pipe(<span style="color: #a020f0;">lambda</span> x: x.groupby([<span style="color: #8b2252;">'team1'</span>, <span style="color: #8b2252;">'team2'</span>])[<span style="color: #8b2252;">'scorediff'</span>].mean())
+                     .reindex(teams_pairwise)
+)
+<span style="color: #a0522d;">has_values</span> = ~pairwise_scorediff.isna()
+pairwise_scorediff.loc[pairwise_scorediff[has_values].swaplevel().index.values] = (-pairwise_scorediff[has_values]).values
+<span style="color: #a0522d;">pairwise_scorediff</span> = pairwise_scorediff.unstack()
+
+<span style="color: #b22222;"># </span><span style="color: #b22222;">matrix completion using convex optimization to find low-rank solution</span>
+<span style="color: #b22222;"># </span><span style="color: #b22222;">that still matches observed values. Slow!</span>
+<span style="color: #a0522d;">X_filled_nnm</span> = NuclearNormMinimization().fit_transform(pairwise_scorediff)
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orga3c47fc" class="outline-3">
+<h3 id="orga3c47fc"><span class="section-number-3">3.1</span> Accuracy</h3>
+<div class="outline-text-3" id="text-3-1">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">df_pred</span> = pd.DataFrame(X_filled_nnm, index=pairwise_scorediff.index, columns=pairwise_scorediff.columns)
+<span style="color: #a0522d;">tourney_matchups</span> = data.loc[data[<span style="color: #8b2252;">'tourney'</span>] == 1, [<span style="color: #8b2252;">'team1'</span>, <span style="color: #8b2252;">'team2'</span>]]
+<span style="color: #a0522d;">y_pred</span> = np.array([df_pred.loc[i, j] <span style="color: #a020f0;">for</span> i, j <span style="color: #a020f0;">in</span> tourney_matchups.values])
+<span style="color: #a0522d;">y_true</span> = data.loc[data[<span style="color: #8b2252;">'tourney'</span>] == 1, <span style="color: #8b2252;">'scorediff'</span>]
+<span style="color: #a020f0;">print</span>(<span style="color: #8b2252;">'accuracy = {}'</span>.<span style="color: #483d8b;">format</span>(np.mean((y_pred &gt; 0) == (y_true &gt; 0))))
+</pre>
+</div>
+
+<pre class="example">
+accuracy = 0.6716417910447762
+
+</pre>
+</div>
+</div>
+
+<div id="outline-container-orgf4b6a7f" class="outline-3">
+<h3 id="orgf4b6a7f"><span class="section-number-3">3.2</span> Prediction vs Actual</h3>
+<div class="outline-text-3" id="text-3-2">
+<div class="org-src-container">
+<pre class="src src-python"><span style="color: #a0522d;">fig</span>, <span style="color: #a0522d;">ax</span> = plt.subplots(figsize=(10,10))
+ax.scatter(y_true, y_pred)
+ax.grid(<span style="color: #008b8b;">True</span>)
+ax.plot(np.arange(-20, 20), np.arange(-20, 20))
+ax.set_xlabel(<span style="color: #8b2252;">'actual'</span>)
+ax.set_ylabel(<span style="color: #8b2252;">'pred'</span>)
+show_fig(<span style="color: #8b2252;">'pred_vs_actual_nnm.png'</span>)
+</pre>
+</div>
+
+
+<div class="figure">
+<p><img src="../figs/eda/pairwise_matchups/pred_vs_actual_nnm.png" alt="pred_vs_actual_nnm.png" />
+</p>
+</div>
+
+<p>
+Points in the first and fourth quadrants are incorrect predictions.
 </p>
 </div>
 </div>

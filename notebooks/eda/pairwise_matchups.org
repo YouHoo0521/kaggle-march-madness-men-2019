@@ -36,8 +36,8 @@ title: Pairwise Matchups
 
 ** Helper Functions
 #+begin_src python :session
-  print_df = utils.create_print_df_fcn(tablefmt='html');
-  show_fig = utils.create_show_fig_fcn(img_dir='eda/eda_{}_v2/'.format(SEASON));
+  print_df = utils.create_print_df_fcn(tablefmt='orgtbl');
+  show_fig = utils.create_show_fig_fcn(img_dir='eda/pairwise_matchups/'.format(SEASON));
 #+end_src
 
 #+RESULTS:
@@ -64,6 +64,19 @@ title: Pairwise Matchups
 : |  3 |     2015 |       11 |       0 |         0 |    1113 |    1152 |       86 |       50 |  1113 |          1 | nan     |        nan |     nan |        nan | pac_twelve    | Pacific-12 Conference    | wac           | Western Athletic Conference   | Arizona St  |             1985 |            2019 | Chicago St   |             1985 |            2019 |        nan | 2015_1113_1152 |            69.4375 |          12.024   |          23.625  |         4.44863 |          53.1562 |         7.37961 |           6.8125  |          2.84477 |           19.5625 |          4.73789 |          15.375  |         6.10526 |          23      |         8.94788 |        10.7188  |        3.61212 |         23.875  |        5.33249 |          12.9375 |         3.77545 |         13.875  |        3.09787 |          5.90625 |         2.45422 |          2.28125 |         1.61114 |         18.9375 |        3.40718 |           66.4375 |         13.2979  |         24      |        5.14938 |         53.3438 |        7.40797 |          5.5     |         2.38273 |          15.1562 |         4.71859 |         12.9375 |        5.73578 |         18.625  |        6.72381 |        8.3125  |       3.89737 |        22.9062 |       4.9797  |        12.3438  |        4.44761 |        12.9688 |       3.9471  |         6.125   |        2.47243 |         4.1875  |        2.87859 |        21.0938 |       4.69289 |            55.2414 |          11.3975  |          19.6207 |         4.27963 |          53.5517 |         5.78536 |           6.06897 |          2.34416 |           20.1034 |          4.82068 |          9.93103 |         5.35811 |          14.5172 |         6.73806 |         12.2759 |        3.84426 |         19.8966 |        4.4669  |          8.82759 |         2.86692 |         14.931  |        4.75793 |          7.68966 |         3.36052 |          2.86207 |         2.341   |         22.1724 |        4.44063 |           67.5172 |         11.5561  |         21.5517 |        4.24757 |         47.4138 |        6.8218  |          6.96552 |         3.1451  |          18.2759 |         6.13478 |         17.4483 |        6.23118 |         25.6207 |        8.92994 |        10      |       4.14901 |        23.9655 |       4.19594 |         12.8966 |        3.94013 |       14.1379  |       5.132   |         7.31034 |        3.14079 |         3.51724 |        1.93872 |        15.7586 |       4.48533 |          36 |        86 |        50 |
 : |  4 |     2015 |       11 |       0 |         0 |    1102 |    1119 |       78 |       84 |  1119 |          0 | nan     |        nan |     nan |        nan | mwc           | Mountain West Conference | patriot       | Patriot League                | Air Force   |             1985 |            2019 | Army         |             1985 |            2019 |        nan | 2015_1102_1119 |            64.7241 |          11.3983  |          23.6207 |         4.32942 |          50.7586 |         6.67434 |           7.17241 |          3.0714  |           20.2414 |          4.9183  |          10.3103 |         4.97927 |          15.6552 |         6.2751  |         8.7931  |        4.03006 |         20.7931 |        3.99445 |          14.8966 |         4.76853 |         11.7241 |        3.72153 |          6.31034 |         2.46553 |          1.96552 |         1.88002 |         17.8276 |        3.28491 |           65.8621 |         12.9965  |         22.6897 |        4.08921 |         50.4828 |        6.2199  |          8.13793 |         2.94866 |          22.2414 |         4.61097 |         12.3448 |        6.0254  |         17.8966 |        7.85741 |       10.0345  |       4.37919 |        21.069  |       5.86108 |        14.4483  |        4.07594 |        12.3793 |       3.34252 |         5.7931  |        2.56876 |         3.62069 |        2.04265 |        17.069  |       4.52715 |            71.4138 |           8.55869 |          25.6207 |         3.78355 |          58.5862 |         6.52204 |           7.34483 |          2.70285 |           22.7931 |          4.86518 |         12.8276  |         4.9213  |          18.7586 |         6.96243 |         10.5517 |        3.68962 |         23.6207 |        3.94076 |         14.1379  |         2.46003 |         13.3448 |        3.53832 |          6.13793 |         2.70877 |          3.55172 |         1.91956 |         20.6897 |        3.15214 |           72.931  |         11.6372  |         25.8621 |        4.82349 |         56.4828 |        6.8171  |          5.82759 |         2.81665 |          16.3448 |         4.38566 |         15.3793 |        5.62782 |         23      |        7.31437 |        10.8621 |       3.51247 |        24.9655 |       4.57854 |         14.069  |        4.81019 |       13.2069  |       4.00339 |         7       |        2.952   |         3.62069 |        2.41149 |        18.7931 |       3.73573 |          -6 |        84 |        78 |
 
+** Process Data
+#+begin_src python :session :exports both :results output file :eval never-export
+  TeamConferences = (pd.read_csv(
+      os.path.join(utils.get_project_root(), 'input/datafiles/TeamConferences.csv'))
+		     .pipe(lambda x:x[x['Season'] == SEASON])
+		     )
+  teams_ordered = list(TeamConferences.sort_values(['ConfAbbrev', 'TeamID'])['TeamID'])
+  teams_pairwise = [(t1, t2) for t1 in teams_ordered for t2 in teams_ordered]
+#+end_src
+
+#+RESULTS:
+[[file:]]
+
 ** Basic Description
 #+begin_src python :session :exports both :results output :eval never-export
   n_missing = data.isna().sum().rename('n_missing')
@@ -84,16 +97,9 @@ title: Pairwise Matchups
 | max       |     2015 |  154      |    4         |    1         | 1460      | 1464      |  116      |  126      |    1        |   16       |   16       |       2014       |            2019 |       2014       |            2019 |   15        |           83.8148  |          16.5944  |         29.2963  |        6.31     |         67.3929  |        9.84401  |          10.9286  |         4.56175  |          34.8214  |         8.86965  |         19.25    |        8.39282  |         26.0588  |        10.3776  |        16.8438  |       6.33148  |        29       |       6.90314  |         17.7429  |        5.62746  |        18.2414  |       5.73719  |         10.9375  |        4.24917  |         7.87879  |        3.39295  |        23.3438  |       6.16956  |          83.8889  |         16.0707  |        30       |       6.12221  |        62.7941  |      10.0667   |         9.42857  |        4.22486  |         24.5     |         8.95718 |        20       |       7.9761   |        27.4333  |       10.671   |       14.5185  |      6.22707  |       29.8929  |      6.8251   |        16.9     |       6.56917  |       19.625   |      5.49477  |        9.37931  |       4.58128  |         5.44828 |       3.09987  |        22.4688 |      5.58301  |           83.8148  |          16.5944  |         29.2963  |        6.31     |         67.3929  |         9.84401 |          10.9286  |         4.56175  |          34.8214  |         8.86965  |         19.25    |        8.39282  |         26.0588  |        10.3776  |        16.8438  |       6.33148  |        29       |       6.90314  |         17.7429  |        5.57457  |        18.2414  |       5.73719  |         10.9375  |        4.24917  |         7.87879  |        3.39295  |        23.3438  |       6.16956  |          83.8889  |         16.0707  |        30       |       6.12221  |        62.7941  |      10.0667   |         9.42857  |        4.22486  |         24.5     |        8.95718  |        20       |       7.9761   |        27.5862  |       10.671   |       14.5185  |      6.22707  |       29.8929  |      6.8251   |        16.9     |       6.56917  |       19.625   |      5.49477  |        9.37931  |       4.58128  |        5.44828  |       3.09987  |       22.4688  |      5.58301  |   69        |  126      |  111      |  nan |           nan |           nan |           nan |           nan |   nan |     nan |     nan |         nan |         nan |
 | n_missing |        0 |    0      |    0         |    0         |    0      |    0      |    0      |    0      |    0        | 4255       | 4260       |          0       |               0 |          0       |               0 | 5045        |            0       |           0       |          0       |        0        |          0       |        0        |           0       |         0        |           0       |         0        |          0       |        0        |          0       |         0       |         0       |       0        |         0       |       0        |          0       |        0        |         0       |       0        |          0       |        0        |         0        |        0        |         0       |       0        |           0       |          0       |         0       |       0        |         0       |       0        |         0        |        0        |          0       |         0       |         0       |       0        |         0       |        0       |        0       |      0        |        0       |      0        |         0       |       0        |        0       |      0        |        0        |       0        |         0       |       0        |         0      |      0        |            0       |           0       |          0       |        0        |          0       |         0       |           0       |         0        |           0       |         0        |          0       |        0        |          0       |         0       |         0       |       0        |         0       |       0        |          0       |        0        |         0       |       0        |          0       |        0        |         0        |        0        |         0       |       0        |           0       |          0       |         0       |       0        |         0       |       0        |         0        |        0        |          0       |        0        |         0       |       0        |         0       |        0       |        0       |      0        |        0       |      0        |         0       |       0        |        0       |      0        |        0        |       0        |        0        |       0        |        0       |      0        |    0        |    0      |    0      |    0 |             0 |             0 |             0 |             0 |     0 |    4255 |    4260 |           0 |           0 |
 #+end_example
-
 * Visualizations
-** Heatmap of pairwise matchups
+** Heatmap of pairwise matchups - Regular
 #+begin_src python :session :exports both :results output file :eval never-export
-  TeamConferences = (pd.read_csv(
-      os.path.join(utils.get_project_root(), 'input/datafiles/TeamConferences.csv'))
-		     .pipe(lambda x:x[x['Season'] == SEASON])
-		     )
-  teams_ordered = list(TeamConferences.sort_values(['ConfAbbrev', 'TeamID'])['TeamID'])
-  teams_pairwise = [(t1, t2) for t1 in teams_ordered for t2 in teams_ordered]
   pairwise_matchups = (data[data['tourney'] == 0]
 		       .pipe(lambda x: x.groupby(['team1', 'team2'])['scorediff'].size() > 0)
 		       .reindex(teams_pairwise)
@@ -108,36 +114,74 @@ title: Pairwise Matchups
 #+end_src
 
 #+RESULTS:
-[[file:../figs/eda/eda_2015_v2/regular_pairwise_matchup_heatmap.png]]
+[[file:../figs/eda/pairwise_matchups/regular_pairwise_matchup_heatmap.png]]
 
 The figure above shows the pairwise matchups between teams. The teams
 are ordered by conference. The diagonal blocks indicate that teams
 play with [almost] every other team within their conference. The games
 across conferences are much more sparse.
-** Heatmap of pairwise matchups
+** Heatmap of pairwise matchups - Tournament
 #+begin_src python :session :exports both :results output file :eval never-export
-  TeamConferences = (pd.read_csv(
-      os.path.join(utils.get_project_root(), 'input/datafiles/TeamConferences.csv'))
-		     .pipe(lambda x:x[x['Season'] == SEASON])
-		     )
-  teams_ordered = list(TeamConferences.sort_values(['ConfAbbrev', 'TeamID'])['TeamID'])
-  teams_pairwise = [(t1, t2) for t1 in teams_ordered for t2 in teams_ordered]
-  pairwise_matchups = (data[data['tourney'] == 1]
+  tourney_pairwise_matchups = (data[data['tourney'] == 1]
 		       .pipe(lambda x: x.groupby(['team1', 'team2'])['scorediff'].size() > 0)
 		       .reindex(teams_pairwise)
 		       .fillna(False)
   )
-  pairwise_matchups.loc[pairwise_matchups[pairwise_matchups].swaplevel().index.values] = True
-  pairwise_matchups = pairwise_matchups.unstack()
+  tourney_pairwise_matchups.loc[tourney_pairwise_matchups[tourney_pairwise_matchups].swaplevel().index.values] = True
+  tourney_pairwise_matchups = tourney_pairwise_matchups.unstack()
   fig, ax = plt.subplots(figsize=(10, 10))
-  sns.heatmap(pairwise_matchups.loc[teams_ordered, teams_ordered], ax=ax, cbar=False)
+  sns.heatmap(tourney_pairwise_matchups.loc[teams_ordered, teams_ordered], ax=ax, cbar=False)
   ax.set_title('Tourney Season Pairwise Matchups')
   show_fig('tourney_pairwise_matchup_heatmap.png')
 #+end_src
 
 #+RESULTS:
-[[file:../figs/eda/eda_2015_v2/tourney_pairwise_matchup_heatmap.png]]
+[[file:../figs/eda/pairwise_matchups/tourney_pairwise_matchup_heatmap.png]]
 
 As shown above, most games in the tournament are played outside of the
 conference. A good model must be able to generalize to games played
 across conferences.
+* Matrix completion by nuclear norm minimization
+#+begin_src python :session :exports both :results output :eval no
+  from fancyimpute import NuclearNormMinimization
+
+  pairwise_scorediff = (data[data['tourney'] == 0]
+		       .pipe(lambda x: x.groupby(['team1', 'team2'])['scorediff'].mean())
+		       .reindex(teams_pairwise)
+  )
+  has_values = ~pairwise_scorediff.isna()
+  pairwise_scorediff.loc[pairwise_scorediff[has_values].swaplevel().index.values] = (-pairwise_scorediff[has_values]).values
+  pairwise_scorediff = pairwise_scorediff.unstack()
+
+  # matrix completion using convex optimization to find low-rank solution
+  # that still matches observed values. Slow!
+  X_filled_nnm = NuclearNormMinimization().fit_transform(pairwise_scorediff)
+#+end_src
+
+** Accuracy
+#+begin_src python :session :exports both :results output :eval never-export
+  df_pred = pd.DataFrame(X_filled_nnm, index=pairwise_scorediff.index, columns=pairwise_scorediff.columns)
+  tourney_matchups = data.loc[data['tourney'] == 1, ['team1', 'team2']]
+  y_pred = np.array([df_pred.loc[i, j] for i, j in tourney_matchups.values])
+  y_true = data.loc[data['tourney'] == 1, 'scorediff']
+  print('accuracy = {}'.format(np.mean((y_pred > 0) == (y_true > 0))))
+#+end_src
+
+#+RESULTS:
+: accuracy = 0.6716417910447762
+
+** Prediction vs Actual
+#+begin_src python :session :exports both :results output file :eval never-export
+  fig, ax = plt.subplots(figsize=(10,10))
+  ax.scatter(y_true, y_pred)
+  ax.grid(True)
+  ax.plot(np.arange(-20, 20), np.arange(-20, 20))
+  ax.set_xlabel('actual')
+  ax.set_ylabel('pred')
+  show_fig('pred_vs_actual_nnm.png')
+#+end_src
+
+#+RESULTS:
+[[file:../figs/eda/pairwise_matchups/pred_vs_actual_nnm.png]]
+
+Points in the first and fourth quadrants are incorrect predictions.
