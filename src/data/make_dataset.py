@@ -99,11 +99,11 @@ def get_train_data_v1(season=None, detailed=False):
     return data
 
 
-def get_boxscore_dataset_v1(season=None):
+def get_boxscore_dataset_v1(season=None, detailed=False):
     '''
     Extend train_data_v1 with seasonwise mean/std boxscore columns for each team and opponent
     '''
-    data = get_train_data_v1(season=season) # main data
+    data = get_train_data_v1(season=season, detailed=detailed) # main data
     ##################################################
     # regular season boxscore data
     ##################################################
