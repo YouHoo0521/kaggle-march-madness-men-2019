@@ -7,14 +7,15 @@ from src.utils import get_project_root
 DATAFILES_BASEDIR = os.path.join(get_project_root(), 'input/datafiles/')
 
 
-def get_train_data_v1(season=None):
+def get_train_data_v1(season=None, detailed=False):
+    detail = 'Detailed' if detailed else 'Compact'
     ##################################################
     # read data
     ##################################################
-    RegularSeasonCompactResults = pd.read_csv(
-        os.path.join(DATAFILES_BASEDIR, 'RegularSeasonCompactResults.csv'))
-    NCAATourneyCompactResults = pd.read_csv(
-        os.path.join(DATAFILES_BASEDIR, 'NCAATourneyCompactResults.csv'))
+    RegularSeasonResults = pd.read_csv(
+        os.path.join(DATAFILES_BASEDIR, 'RegularSeason{}Results.csv'.format(detail)))
+    NCAATourneyResults = pd.read_csv(
+        os.path.join(DATAFILES_BASEDIR, 'NCAATourney{}Results.csv'.format(detail)))
     NCAATourneySeeds = pd.read_csv(
         os.path.join(DATAFILES_BASEDIR, 'NCAATourneySeeds.csv'))
     TeamConferences = pd.read_csv(
@@ -29,10 +30,10 @@ def get_train_data_v1(season=None):
     # process data
     ##################################################
     NCAATourneySeeds['seednum'] = NCAATourneySeeds['Seed'].str.slice(1, 3).astype(int)
-    RegularSeasonCompactResults['tourney'] = 0
-    NCAATourneyCompactResults['tourney'] = 1
+    RegularSeasonResults['tourney'] = 0
+    NCAATourneyResults['tourney'] = 1
     # combine regular and tourney data
-    data = pd.concat([RegularSeasonCompactResults, NCAATourneyCompactResults])
+    data = pd.concat([RegularSeasonResults, NCAATourneyResults])
     if season:
         data = data[data.Season == season]  # filter season
     ##################################################
@@ -42,10 +43,18 @@ def get_train_data_v1(season=None):
     # team2: team with higher id
     data['team2'] = (data['WTeamID'].where(data['WTeamID'] > data['LTeamID'],
                                            data['LTeamID']))
-    data['team1'] = (data['WTeamID'].where(data['WTeamID'] < data['LTeamID'],
-                                           data['LTeamID']))
     data['score1'] = data['WScore'].where(data['WTeamID'] < data['LTeamID'], data['LScore'])
     data['score2'] = data['WScore'].where(data['WTeamID'] > data['LTeamID'], data['LScore'])
+    boxscore_stats = ['FGM', 'FGA', 'FGM3', 'FGA3', 'FTM', 'FTA',
+                      'OR', 'DR', 'Ast', 'TO', 'Stl', 'Blk', 'PF',]
+    if detailed:
+        for stat in boxscore_stats:
+            data[stat + '_team1'] = data['W' + stat].where(data['WTeamID'] < data['LTeamID'],
+                                                      data['L' + stat])
+            data[stat + '_team2'] = data['W' + stat].where(data['WTeamID'] > data['LTeamID'],
+                                                      data['L' + stat])
+        data = data.drop(['W'+stat for stat in boxscore_stats], axis=1)
+        data = data.drop(['L'+stat for stat in boxscore_stats], axis=1)
     data['loc'] = (data['WLoc']
                    .where(data['WLoc'] != 'H', data['WTeamID'])
                    .where(data['WLoc'] != 'A', data['LTeamID'])
