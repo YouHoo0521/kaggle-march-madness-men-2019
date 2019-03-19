@@ -115,6 +115,7 @@ if __name__ == '__main__':
     parser.add_argument('--year', type=int, default=2015)
     parser.add_argument('--num_iter', type=int, default=500)
     parser.add_argument('--num_chains', type=int, default=4)
+    parser.add_argument('--predict', action='store_true')
     args = parser.parse_args()
     # create model and fit directories
     model_directory = os.path.join(MODEL_BASEDIR, args.model_name)
@@ -123,6 +124,7 @@ if __name__ == '__main__':
     # pickle files for model and fit
     model_fname = os.path.join(model_directory, 'model.pkl')
     fit_fname = os.path.join(fit_directory, 'fit.pkl')
+    pred_fname = os.path.join(fit_directory, 'pred.csv')
     # compmile model
     stan_data, data = create_stan_data(args.year)
     if os.path.exists(model_fname):
@@ -134,9 +136,15 @@ if __name__ == '__main__':
         with open(model_fname, "wb") as f:
             pickle.dump({'sm': sm}, f, protocol=-1)
     # fit model
-    fit = sm.sampling(data=stan_data, iter=args.num_iter, chains=args.num_chains)
-    with open(fit_fname, "wb") as f:
-        pickle.dump({'sm': sm, 'fit': fit}, f, protocol=-1)
+    if not args.predict:
+        fit = sm.sampling(data=stan_data, iter=args.num_iter, chains=args.num_chains)
+        with open(fit_fname, "wb") as f:
+            pickle.dump({'sm': sm, 'fit': fit}, f, protocol=-1)
+    else:
+        with open(fit_fname, "rb") as f:
+            pickle_data = pickle.load(f)
+            sm = pickle_data['sm']
+            fit = pickle_data['fit']
 
     la = fit.extract()
     alpha = la['alpha']
@@ -147,3 +155,7 @@ if __name__ == '__main__':
     num_correct = ((y_pred > 0.5) == y_true).sum()
     num_error = ((y_pred > 0.5) != y_true).sum()
     print('log_loss={:0.2f}\tnum_correct={:d}\tnum_error={:d}'.format(loss, num_correct, num_error))
+    ID = data.loc[data['tourney'] == 1, 'ID'].values
+    df_pred = pd.DataFrame({'y_pred':y_pred, 'y_true':y_true, 'ID':ID})
+    # save prediction csv
+    df_pred[['ID', 'y_pred']].to_csv(pred_fname, index=False)
