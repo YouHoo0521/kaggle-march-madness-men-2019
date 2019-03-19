@@ -342,8 +342,8 @@ if __name__ == '__main__':
                                     data.loc[data['tourney'] == 1,'score2'].values])
     points_error = points_pred - points_actual
     print(np.quantile(points_error, q=[0.10, 0.25, 0.5, 0.75, 0.90]))
-
-    prob_win = np.mean(points_sim[:,:67] > points_sim[:,67:], axis=0)
+    n_pred = int(points_sim.shape[1]/2)
+    prob_win = np.mean(points_sim[:,:n_pred] > points_sim[:,n_pred:], axis=0)
     win_actual = (data.loc[data['tourney'] == 1, 'team1win'] == 1).values
     correct = win_actual == (prob_win > 0.5)
     accuracy = np.mean(correct)
