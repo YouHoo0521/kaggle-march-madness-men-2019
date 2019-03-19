@@ -276,6 +276,7 @@ if __name__ == '__main__':
     parser.add_argument('--year', type=int, default=2015)
     parser.add_argument('--num_iter', type=int, default=500)
     parser.add_argument('--num_chains', type=int, default=4)
+    parser.add_argument('--predict', action='store_true')
     args = parser.parse_args()
     # create model and fit directories
     model_directory = os.path.join(MODEL_BASEDIR, args.model_name)
@@ -285,30 +286,45 @@ if __name__ == '__main__':
     model_fname_poisson = os.path.join(model_directory, 'poisson_model.pkl')
     # pickle files for model and fit
     model_fname_binomial = os.path.join(model_directory, 'binomial_model.pkl')
+    pred_fname = os.path.join(fit_directory, 'pred.csv')
     sm_poisson_dict = {}
     fit_poisson_dict = {}
     sm_binomial_dict = {}
     fit_binomial_dict = {}
-    for y_att, y_made in zip(['fga', 'fga3', 'fta'], ['fgm', 'fgm3', 'ftm']):
-        fit_fname_poisson = os.path.join(fit_directory, 'poisson_fit_{}.pkl'.format(y_att))
-        fit_fname_binomial = os.path.join(fit_directory, 'binomial_fit_{}.pkl'.format(y_att))
-        print('Fitting poisson model for: {}'.format(y_att))
-        sm_poisson_dict[y_att], fit_poisson_dict[y_att] = fit_poisson_model(
-            year=args.year,
-            y_att=y_att,
-            model_fname=model_fname_poisson,
-            fit_fname=fit_fname_poisson,
-            num_chains=args.num_chains,
-            num_iter=args.num_iter)
-        print('Fitting binomial model for: {}'.format(y_att))
-        sm_binomial_dict[y_att], fit_binomial_dict[y_att] = fit_binomial_model(
-            year=args.year,
-            y_att=y_att,
-            y_made=y_made,
-            model_fname=model_fname_binomial,
-            fit_fname=fit_fname_binomial,
-            num_chains=args.num_chains,
-            num_iter=args.num_iter)
+    if not args.predict:
+        for y_att, y_made in zip(['fga', 'fga3', 'fta'], ['fgm', 'fgm3', 'ftm']):
+            fit_fname_poisson = os.path.join(fit_directory, 'poisson_fit_{}.pkl'.format(y_att))
+            fit_fname_binomial = os.path.join(fit_directory, 'binomial_fit_{}.pkl'.format(y_att))
+            print('Fitting poisson model for: {}'.format(y_att))
+            sm_poisson_dict[y_att], fit_poisson_dict[y_att] = fit_poisson_model(
+                year=args.year,
+                y_att=y_att,
+                model_fname=model_fname_poisson,
+                fit_fname=fit_fname_poisson,
+                num_chains=args.num_chains,
+                num_iter=args.num_iter)
+            print('Fitting binomial model for: {}'.format(y_att))
+            sm_binomial_dict[y_att], fit_binomial_dict[y_att] = fit_binomial_model(
+                year=args.year,
+                y_att=y_att,
+                y_made=y_made,
+                model_fname=model_fname_binomial,
+                fit_fname=fit_fname_binomial,
+                num_chains=args.num_chains,
+                num_iter=args.num_iter)
+    else:
+        for y_att in ['fga', 'fga3', 'fta']:
+            fit_fname_poisson = os.path.join(fit_directory, 'poisson_fit_{}.pkl'.format(y_att))
+            fit_fname_binomial = os.path.join(fit_directory, 'binomial_fit_{}.pkl'.format(y_att))
+            with open(fit_fname_poisson, 'rb') as f:
+                pickle_data = pickle.load(f)
+                sm_poisson_dict[y_att] = pickle_data['sm_poisson']
+                fit_poisson_dict[y_att] = pickle_data['fit_poisson']
+            with open(fit_fname_binomial, 'rb') as f:
+                pickle_data = pickle.load(f)
+                sm_binomial_dict[y_att] = pickle_data['sm_binomial']
+                fit_binomial_dict[y_att] = pickle_data['fit_binomial']
+        pass
     # process results
     la_poisson_dict = {}
     la_binomial_dict = {}
@@ -333,3 +349,6 @@ if __name__ == '__main__':
     accuracy = np.mean(correct)
     loss = log_loss(win_actual, prob_win)
     print("year = {}\taccuracy = {}\t loss = {}".format(args.year, accuracy, loss))
+    # save prediction
+    df_pred = pd.DataFrame({'ID':data.loc[data['tourney'] == 1, 'ID'], 'Pred':prob_win})
+    df_pred.to_csv(pred_fname, index=False)
