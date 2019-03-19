@@ -156,6 +156,6 @@ if __name__ == '__main__':
     num_error = ((y_pred > 0.5) != y_true).sum()
     print('log_loss={:0.2f}\tnum_correct={:d}\tnum_error={:d}'.format(loss, num_correct, num_error))
     ID = data.loc[data['tourney'] == 1, 'ID'].values
-    df_pred = pd.DataFrame({'y_pred':y_pred, 'y_true':y_true, 'ID':ID})
+    df_pred = pd.DataFrame({'ID':ID, 'Pred':y_pred})
     # save prediction csv
-    df_pred[['ID', 'y_pred']].to_csv(pred_fname, index=False)
+    df_pred[['ID', 'Pred']].to_csv(pred_fname, index=False)
