@@ -4,7 +4,7 @@ import os
 from src.utils import get_project_root
 
 
-DATAFILES_BASEDIR = os.path.join(get_project_root(), 'input/datafiles/')
+DATAFILES_BASEDIR = os.path.join(get_project_root(), 'input/datafiles_stage2/')
 
 
 def get_train_data_v1(season=None, detailed=False):
