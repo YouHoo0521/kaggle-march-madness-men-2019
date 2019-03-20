@@ -99,11 +99,18 @@ def get_train_data_v1(season=None, detailed=False):
     return data
 
 
-def get_boxscore_dataset_v1(season=None, detailed=False):
+def get_boxscore_dataset_v1(season=None, detailed=False, final_prediction=False):
     '''
     Extend train_data_v1 with seasonwise mean/std boxscore columns for each team and opponent
     '''
-    data = get_train_data_v1(season=season, detailed=detailed) # main data
+    if final_prediction:
+        data_sub = pd.read_csv(os.path.join(get_project_root(), 'input/SampleSubmissionStage2.csv'))
+        data = data_sub['ID'].str.split('_', expand=True).astype(int)
+        data.index = data_sub['ID']
+        data.columns = ['season', 'team1', 'team2']
+        data = data.reset_index()
+    else:
+        data = get_train_data_v1(season=season, detailed=detailed) # main data
     ##################################################
     # regular season boxscore data
     ##################################################
