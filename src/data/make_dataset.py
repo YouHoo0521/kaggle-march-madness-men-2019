@@ -26,6 +26,13 @@ def get_train_data_v1(season=None, detailed=False):
         os.path.join(DATAFILES_BASEDIR, 'Teams.csv'))
     TeamConferences = (pd.merge(TeamConferences, Conferences, on='ConfAbbrev')
                        .rename({'Description': 'conf_descr'}, axis=1))
+    SampleSubmissionStage2 = pd.read_csv(
+        os.path.join(get_project_root(), 'input/SampleSubmissionStage2.csv'))
+    tourney2019 = SampleSubmissionStage2['ID'].str.split('_', expand=True).astype(int)
+    # tourney2019.index = SampleSubmissionStage2['ID']
+    tourney2019.columns = ['Season', 'WTeamID', 'LTeamID']
+    NCAATourneyResults = pd.concat([NCAATourneyResults, tourney2019])
+    # tourney2019 = tourney2019.reset_index()
     ##################################################
     # process data
     ##################################################
