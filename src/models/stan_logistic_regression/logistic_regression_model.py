@@ -145,17 +145,18 @@ if __name__ == '__main__':
             pickle_data = pickle.load(f)
             sm = pickle_data['sm']
             fit = pickle_data['fit']
-
     la = fit.extract()
     alpha = la['alpha']
     pi = la['pi']
     y_pred = np.median(pi, axis=0)
-    y_true = data.loc[data['tourney'] == 1,'team1win'].values
-    loss = log_loss(y_true, y_pred)
-    num_correct = ((y_pred > 0.5) == y_true).sum()
-    num_error = ((y_pred > 0.5) != y_true).sum()
-    print('log_loss={:0.2f}\tnum_correct={:d}\tnum_error={:d}'.format(loss, num_correct, num_error))
     ID = data.loc[data['tourney'] == 1, 'ID'].values
     df_pred = pd.DataFrame({'ID':ID, 'Pred':y_pred})
     # save prediction csv
     df_pred[['ID', 'Pred']].to_csv(pred_fname, index=False)
+    # print loss
+    if args.year != 2019:
+        y_true = data.loc[data['tourney'] == 1,'team1win'].values
+        loss = log_loss(y_true, y_pred)
+        num_correct = ((y_pred > 0.5) == y_true).sum()
+        num_error = ((y_pred > 0.5) != y_true).sum()
+        print('log_loss={:0.2f}\tnum_correct={:d}\tnum_error={:d}'.format(loss, num_correct, num_error))

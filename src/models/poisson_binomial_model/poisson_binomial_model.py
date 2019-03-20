@@ -336,19 +336,19 @@ if __name__ == '__main__':
     fg3_made_sim = la_poisson_dict['fga3']['y_att_new'] * la_binomial_dict['fga3']['pi_new']
     ft_made_sim = la_poisson_dict['fta']['y_att_new'] * la_binomial_dict['fta']['pi_new']
     points_sim = fg2_made_sim * 2 + fg3_made_sim * 3 + ft_made_sim
-
     points_pred = np.mean(points_sim, axis=0)
+    n_pred = int(points_sim.shape[1]/2)
+    prob_win = np.mean(points_sim[:,:n_pred] > points_sim[:,n_pred:], axis=0)
+    # save prediction
+    df_pred = pd.DataFrame({'ID':data.loc[data['tourney'] == 1, 'ID'], 'Pred':prob_win})
+    df_pred.to_csv(pred_fname, index=False)
+    # print loss and accuracy
     points_actual = np.concatenate([data.loc[data['tourney'] == 1,'score1'].values,
                                     data.loc[data['tourney'] == 1,'score2'].values])
     points_error = points_pred - points_actual
     print(np.quantile(points_error, q=[0.10, 0.25, 0.5, 0.75, 0.90]))
-    n_pred = int(points_sim.shape[1]/2)
-    prob_win = np.mean(points_sim[:,:n_pred] > points_sim[:,n_pred:], axis=0)
     win_actual = (data.loc[data['tourney'] == 1, 'team1win'] == 1).values
     correct = win_actual == (prob_win > 0.5)
     accuracy = np.mean(correct)
     loss = log_loss(win_actual, prob_win)
     print("year = {}\taccuracy = {}\t loss = {}".format(args.year, accuracy, loss))
-    # save prediction
-    df_pred = pd.DataFrame({'ID':data.loc[data['tourney'] == 1, 'ID'], 'Pred':prob_win})
-    df_pred.to_csv(pred_fname, index=False)
