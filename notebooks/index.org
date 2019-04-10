@@ -5,6 +5,9 @@ layout: home
 ---
 #+END_EXPORT
 
+*Update: Our submission (Team Madtown Machine Learning Madness) finished in 3rd place among 866 teams! I'll follow up with a notebook
+describing our model and strategy.*
+
 This is the project site for my machine learning project in CS760 at
 UW-Madison. My group will take on the [[https://www.kaggle.com/c/mens-machine-learning-competition-2019][Kaggle competition for NCAA
 March Madness]]. 
